@@ -1,0 +1,96 @@
+##===========================  S1 READ DATA AND PREP MODEL OBJECTS       =====================================##
+
+##------------------------------  AUTHORS: Cesc Gordó-Vilaseca based on code from Fabrice Stephenson 2020 & Ovaskainen and Abrego 2020
+##=============================================================================================================##
+library(Hmsc)
+getwd()
+localDir <- "."
+data.directory <- file.path(localDir, "data")
+model.directory <- file.path(localDir, "models")
+load(file = file.path(data.directory, "allData.R")) # X, Y, Tr & P Dataframes
+
+hist(X$depth)
+hist(X$dox)
+X$dox = X$dox/1000 ## Corrected after checking units of dox
+
+##### ---------------  CHECKS ON THE SPECIES DATA      ---------------------#####
+# The data that we will utilize for the Hmsc model consist of the community data matrix Y,
+# the environmental data frame X,
+# It is always a good idea to eyeball the data. Let us first have a look at the community data.
+
+# check for absent (0) or ubiquitous species (1)
+range(colMeans(Y>0))
+min(colMeans(Y>0))
+
+hist(colMeans(Y > 0 ), main = "Prevalence", breaks = 20)
+hist(log(Y[Y > 0]), main = "Log abundance conditional on presence") 
+# Fairly normal, good
+
+hist(rowSums(Y>0), main = "Richness across samples") # species richness across samples
+# also looks fairly normal 
+
+# Let us then look at the environmental and spatial data
+head(X)
+names(X)
+
+# the following also show the types (factor, num) of variables:
+str(X)
+# and a full summary
+summary(X)
+
+# The matrix xy contains the the coordinates of the transect IDs.
+# The identities of the transect IDs are given by row names
+##### ---------------  ADDING GPP AS SPATIAL RANDOM EFFECT      ---------------------#####
+xycoords = coords
+xycoords$Latitude[duplicated(xycoords)] = jitter(xycoords$Latitude[duplicated(xycoords)])
+xycoords$Longitude[duplicated(xycoords)] = jitter(xycoords$Longitude[duplicated(xycoords)])
+
+knots = constructKnots(xycoords, knotDist = 3, minKnotDist = 0.6)
+plot(xycoords)
+points(knots, col = "red", add = T, pch = 18)
+
+dim(knots)
+rL.gpp = HmscRandomLevel(sData = xycoords, sMethod = 'GPP', sKnot = knots)
+save(rL.gpp, file = "sData.Rdata")
+
+#####-----------         DEFINING THE HMSC MODEL                           -----------------#######
+# creation of the HMSC formula
+XFormula = ~  depth + sbt + sic + dox + nwc + ewc + phy + I(sbt^2)+ I(depth^2)
+
+Ypa <- 1*(Y>0)
+Yabu <- Y
+Yabu[Y == 0] <- NA
+Yabu <- log(Yabu)
+#hist(Yabu)
+
+#### XSELECT #####
+sp_no_ice = read.csv("data/species_no_ice.csv") # Species list without sea ice 
+Xsel = list()
+XSelect = rep(1,dim(Y)[2])
+XSelect[which(sub("[.]", " ",colnames(Y)) %in% sp_no_ice$Species)] = 2
+spGroup = XSelect
+covGroup = c(4) # The intercept also counts
+q = c(1, 0)
+Xsel = list(covGroup = covGroup, spGroup =  spGroup, q=q)
+
+#### MODEL DEFINITION ######
+
+# We are now ready to define the model. Note that in ranLevels=list(transect=rL), "transect" refers to a column name
+# of the studyDesign
+studyDesign = data.frame(sample = as.factor(1:dim(Ypa)[1]))
+
+rL = HmscRandomLevel(units = studyDesign$sample)
+             
+m1 <- Hmsc(Y=Ypa, XData = X, XFormula = XFormula,
+         phyloTree = P, XSelect = list(Xsel),
+         distr="probit",
+         studyDesign = studyDesign, ranLevels=list("sample" = rL.gpp))
+
+m2 <-  Hmsc(Y=Yabu, YScale = T, XData = X, XFormula = XFormula,
+            phyloTree = P, XSelect = list(Xsel),
+            distr="normal",
+            studyDesign = studyDesign, ranLevels=list("sample" = rL.gpp))
+
+models <- list(m1, m2)
+modelnames = c("PA_model", "AB_model")
+save(models, modelnames, file = file.path(model.directory, "unfitted new_models_yes_sic_spatial_rl1.Rdata"))
