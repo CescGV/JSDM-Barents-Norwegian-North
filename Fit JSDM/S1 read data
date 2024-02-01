@@ -1,0 +1,169 @@
+
+##------------------------------  AUTHORS: Cesc Gordó-Vilaseca based on code from Fabrice Stephenson 2020  & book from Ovaskainen and Abrego 2020
+##=============================================================================================================##
+##====================             RAW CLEANED DATA              ======================================================
+library(tidyverse)
+wd <- "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM"
+setwd(wd)
+
+localDir <- "."
+data.directory <- file.path(localDir, "data")
+model.directory <- file.path(localDir, "models")
+load(file = file.path(data.directory, "data_JSDM_full_new_IMR_2004_2022.Rdata"))
+data = data %>% filter(wgt_cpue > 0, depth < 601)
+sp_out = data %>% group_by(species) %>% count() %>% filter(n<50)
+
+data = data %>% filter(!(species %in% sp_out$species))
+
+# Provide an SXY file.
+DF_biol = data
+head(DF_biol)
+
+# Filter
+
+DF_biol = DF_biol %>% 
+  rename(Longitude = longitude, Latitude = latitude, weight_cpue = wgt_cpue)
+  
+
+colnames(DF_biol)
+Sites = DF_biol %>% dplyr::select(year, Longitude, Latitude, depth, month,
+                                  sbt,dox, sic,ewc,nwc, phy) %>%
+  mutate(sbt = round(sbt,2),
+         sic = round(sic,2),
+         dox = round(dox, 2),
+         ewc = round(ewc,2),
+         nwc = round(nwc,2),
+         phy = round(phy,2)) %>% distinct() %>% 
+  group_by(Longitude, Latitude) %>% 
+  mutate(Transect_ID = cur_group_id())
+
+DF <- DF_biol; #rm(DF_biol) 
+DF <- DF %>% group_by(Longitude, Latitude) %>%
+  mutate(Transect_ID = cur_group_id()) %>% ungroup() %>%
+  mutate(species = str_replace(species, " ", ".")) %>%
+  dplyr::select(Transect_ID, species, weight_cpue, year) %>%
+  group_by(species, Transect_ID, year) %>% 
+  summarise(weight_cpue = sum(weight_cpue)) %>% distinct()
+
+DF_wide = pivot_wider(DF, 
+                      names_from = species, 
+                      values_from = weight_cpue,
+                      values_fill  = 0) 
+
+DF2 = merge(DF_wide, Sites)
+DF2[,order(colnames(DF2))]
+colnames(DF2)
+
+DF2 = DF2 %>% mutate(across(3:ncol(DF2), ~replace(., is.na(.) == T, 0)))
+sp.code <- sort(unique(DF$species))
+
+# All variables available
+
+imp.var <- c("depth", "sbt",
+             "sic","dox", "nwc", "ewc", "phy")
+
+# File for phylogenetic tree in NCBI
+write(unique(data$species),"data/species_107.txt")
+
+####--------       CO-LINEARITY OF ENVIRONMENTAL PREDICTORS      ----------------------####
+
+corDF2 <- data.frame(DF2[,imp.var]) # columns with predictors for the whole dataset 
+cut <- 4 # VIF cutoff, 3 - 4 is usually the arbitrarily selected cutoff 
+
+repeat {
+  corvif<-usdm::vif(corDF2)  # Where corDF2 is a dataframe of variables
+  x<-max(corvif[,2])      # You can play around with different values of x from Yesson et al.,2015
+  if (x<cut){break}
+  else {corDF2<-corDF2[,-which.max(corvif[,2])]}
+}
+
+corvif
+
+# CORRELATION OF PREDICTOR VARIABLES
+corDF2 <- na.omit(corDF2)
+corDF2<-cor(corDF2)
+head(round(corDF2,2))
+
+cor.mtest <- function(mat, ...) {
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat<- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], ...)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+    }
+  }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+# matrix of the p-value of the correlation
+p.mat <- cor.mtest(corDF2)
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+corrplot::corrplot(corDF2, method="color", col=col(200),  
+                   type="upper", order="hclust", 
+                   addCoef.col = "black", # Add coefficient of correlation
+                   tl.col="black", tl.srt=45, #Text label color and rotation
+                   # Combine with significance
+                   p.mat = p.mat, sig.level = 0.05, insig = "blank", 
+                   # hide correlation coefficient on the principal diagonal
+                   diag=FALSE)
+# final variables 
+imp.var <- colnames(corDF2)
+
+####--------       SETTING UP THE FILE STRUCTURE              ----------------------####
+is.P = T
+
+# READING IN SXY: study design (S) and/or covariates (X) and species data (Y) 
+SXY <- DF2; #rm(DF2)
+SXY <- na.omit(SXY)
+
+X=SXY[,imp.var]
+coords=SXY[,c("Longitude", "Latitude")]
+Y=SXY[,sp.code]
+
+
+# Check that the data looks as it should
+View(X)
+View(Y)
+# check that community data are numeric and have finite numbers. If the script
+# writes "Y looks OK", you are ok.
+if (is.numeric(as.matrix(Y)) || is.logical(as.matrix(Y)) && is.finite(sum(Y, na.rm=TRUE))) {
+  print("Y looks OK")
+} else {
+  print("Y should be numeric and have finite values")	}
+# Check that the covariate data do not have missing values (they are allowed for Y but not S, X, P or Tr)
+if (any(is.na(X))) {
+  print("X has NA values - not allowed for")
+} else {
+  print("X looks ok")	}
+
+setwd(wd)
+# READING IN P: phylogenetic information in tree format (P)
+# we use ape package for trees, and P.tre must be in a format that ape understands
+if(is.P){
+  # Read in the phylogenetic tree using read.tree from ape
+  P = ape::read.tree("data/phyliptree_107.phy")
+  P$tip.label = str_replace(P$tip.label, " ", ".")
+  P$tip.label = str_replace(P$tip.label, "'", "")
+  P$tip.label = str_replace(P$tip.label, "'", "")
+  
+  # When you look at P (e.g. write P and press enter),
+  # you should see that it is a phylogenetic tree which
+  # is rooted and includes branch lengths and tip labels
+  # The script below checks if the species names in P are identical (but not necessarily in the same order) as in Y
+  # If the script prints "species names in P and SXY match", you are ok.
+  # If it says that they do not match, you need to modify the files so that they match 
+  if(all(sort(P$tip.label) == sort(colnames(Y)))){
+    print("species names in P and SXY match")
+  } else{
+    print("species names in P and SXY do not match")
+  }
+  # Check that the data looks as it should!
+  plot(P, cex=0.5)
+}
+####--------       FINAL FILES SAVED FOR NEXT SECTION              ----------------------####
+save(X, Y,P, Tr, coords, file = "data/allData.R")
