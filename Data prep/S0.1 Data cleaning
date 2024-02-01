@@ -1,0 +1,80 @@
+#==== S1 DATA GATHERING AND CLEANING  =====================================##
+
+##---  Authors : Cesc Gordó-Vilaseca 
+##=============================================================================================================##
+##=================             RAW CLEANED DATA              =================================================
+wd <- "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM"
+setwd(wd)
+
+localDir <- "."
+data.directory <- file.path(localDir, "data")
+model.directory <- file.path(localDir, "models")
+
+load(file = file.path(data.directory, "NS-IBTS_clean.RData")); norsea = data; rm(data)
+load(file = file.path(data.directory, "data_IMR_Barents_new.RData")); barsea = data; rm(data)
+load(file = file.path(data.directory, "NOW-DATA.RData")); nowsea = now; rm(now)
+nowsea = nowsea[-1]
+colnames(nowsea)[c(6,7)] = c("species","wgt_cpue")
+colnames(norsea)
+
+data = norsea
+# I only select GOV and 3271, because 3270 and 3236 have differences in gear that may
+# that affect the estimation of abundance. 
+data = data[data$gear %in% c("GOV","3271"),]
+
+# I select records within the continental shelf
+data = data[data$depth < 500,]
+
+# I select records only at the species level
+data = data[grepl(pattern = " ",data$accepted_name),]
+
+# I select records only at the species level
+data = data[data$year > 2003 & data$year < 2021,]
+data = data[,c("depth","month","latitude","longitude","year","accepted_name","wgt_cpue")]
+data = na.omit(data)
+colnames(data)[6] = "species"
+colnames(barsea) = tolower(colnames(barsea))
+data = rbind(data, barsea, nowsea)
+
+data = data %>% 
+  group_by(species, longitude, latitude, year, depth, month) %>% 
+  summarise(wgt_cpue =  sum(wgt_cpue)) %>% ungroup()
+
+data = data %>% group_by(species, longitude, latitude, year, month) %>%
+  summarise(depth = mean(depth),
+            wgt_cpue =  mean(wgt_cpue)) %>% ungroup() %>% filter(wgt_cpue > 0)
+
+
+unique(data$species)
+# 193 species
+
+data %>% dplyr::select(longitude, latitude, year) %>% distinct() %>% dim()
+# 16 882 hauls
+
+## Plot the data 
+ggplot(data) + geom_point(aes(x = longitude, y = latitude))
+
+data = rbind(data,nowsea)
+ggplot(data) + geom_point(aes(x = longitude, y = latitude, col = month))
+
+hist(log(data$wgt_cpue))
+
+## Eliminate very rare species that were sampled less than 100 times or less than 10 yrs
+#library(tidyverse)
+#
+sp_dropped1 = data %>% dplyr::select(species, longitude, latitude, year) %>% 
+  group_by(species) %>% count() %>% filter(n < 100) # 50 for Barsea only. 
+sp_dropped2 = data %>% dplyr::select(species, year) %>% distinct() %>% group_by(species) %>%
+  count() %>% filter(n <10)
+
+sp_dropped = unique(c(sp_dropped1$species, sp_dropped2$species))
+data = data[!data$species %in% sp_dropped,]
+
+# The total final dataset includes 
+unique(data$species)
+dim(data)
+dim(unique(cbind(data$longitude, data$latitude, data$year)))
+write.csv(data,"data/data_ready_jsdm_new.csv")
+
+range(data$longitude)
+range(data$latitude)
