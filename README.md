@@ -1,1 +1,1 @@
-# CescGV-JSDM-Barents-Norwegian-North
+# JSDM-Barents-Norwegian-North
