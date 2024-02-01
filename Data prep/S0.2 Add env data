@@ -1,0 +1,111 @@
+library(raster)
+
+sic = raster::stack("Env data/Present/SIC/SIC.tif")
+sic_recent = raster::stack("Env data/Present/SIC/SIC_recent.tif")
+sic = stack(sic, sic_recent)
+
+ewc = raster::stack("Env data/Present/EWC/EWC.tif")
+ewc_recent = raster::stack("Env data/Present/EWC/EWC_recent.tif")
+ewc = stack(ewc,ewc_recent)
+
+nwc = raster::stack("Env data/Present/NWC/NWC.tif")
+nwc_recent = raster::stack("Env data/Present/NWC/NWC_recent.tif")
+nwc = raster::stack(nwc,nwc_recent)
+
+sbt = raster::stack("Env data/Present/SBT/SBT.tif")
+sbt_recent = raster::stack("Env data/Present/SBT/SBT_recent.tif")
+sbt = stack(sbt, sbt_recent)
+
+phy = raster::stack("Env data/Present/PHY/PHY.tif")
+phy_recent = raster::stack("Env data/Present/PHY/PHY_recent.tif")
+phy = stack(phy, phy_recent)
+
+load("DOX_present.Rdata")
+data = read.csv("data/data_ready_jsdm_new.csv")
+
+# It has 12 months x 30 years of data +  Jan-Jul 2023 = 367 temporal layers
+dim(sbt)
+dim(sic)
+dim(phy)
+dim(ewc)
+dim(nwc)
+dim(dox)
+## SIC needs to be averaged across year
+
+dim(sic) ## 367 months/12 = 30 years
+
+sic_ann = stack()
+for (i in (1:30)){
+  dims =  c((i + ((i-1)*11)): (12 + ((i-1)*12))) 
+  print(dims)
+  sic_ann= stack(sic_ann, raster::mean(sic[[dims]], na.rm = T))
+}
+
+## Load general data
+
+sites = unique(data[,c("longitude", "latitude", "year", "month")])
+sites$layer = (as.numeric(sites$year - 1993))*12 + as.numeric(sites$month)
+sites$layer_ann = ceiling(sites$layer*(1/12))
+
+for (i in 1:length(unique(sites$layer_ann))){
+  sites_sel = sites[sites$layer_ann == unique(sites$layer_ann)[[i]],]
+  cords = sites_sel[,c("longitude", "latitude")]
+  sites$sic[sites$layer_ann == unique(sites$layer_ann)[[i]]] = raster::extract(sic_ann[[unique(sites$layer_ann[[i]])]], cords)
+  print(i)
+}
+
+for (i in 1:length(unique(sites$layer_ann))){
+  sites_sel = sites[sites$layer_ann == unique(sites$layer_ann)[[i]],]
+  cords = sites_sel[,c("longitude", "latitude")]
+  sites$dox[sites$layer_ann == unique(sites$layer_ann)[[i]]] = raster::extract(dox[[unique(sites$layer_ann[[i]])]], cords)
+  print(i)
+}
+
+for (i in 1:length(unique(sites$layer))){
+  sites_sel = sites[sites$layer == unique(sites$layer)[[i]],]
+  cords = sites_sel[,c("longitude", "latitude")]
+  sites$ewc[sites$layer == unique(sites$layer)[[i]]] = raster::extract(ewc[[unique(sites$layer[[i]])]], cords)
+  print(i)
+}
+
+for (i in 1:length(unique(sites$layer))){
+  sites_sel = sites[sites$layer == unique(sites$layer)[[i]],]
+  cords = sites_sel[,c("longitude", "latitude")]
+  sites$nwc[sites$layer == unique(sites$layer)[[i]]] = raster::extract(nwc[[unique(sites$layer[[i]])]], cords)
+  print(i)
+}
+
+for (i in 1:length(unique(sites$layer))){
+  sites_sel = sites[sites$layer == unique(sites$layer)[[i]],]
+  cords = sites_sel[,c("longitude", "latitude")]
+  sites$sbt[sites$layer == unique(sites$layer)[[i]]] = raster::extract(sbt[[unique(sites$layer[[i]])]], cords)
+  print(i)
+}
+
+for (i in 1:length(unique(sites$layer))){
+  sites_sel = sites[sites$layer == unique(sites$layer)[[i]],]
+  cords = sites_sel[,c("longitude", "latitude")]
+  sites$phy[sites$layer == unique(sites$layer)[[i]]] = raster::extract(phy[[unique(sites$layer[[i]])]], cords)
+  print(i)
+}
+
+summary(sites)
+
+ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = sbt))
+
+summary(sites)
+sites$sic[is.na(sites$sic)] = 0
+sites
+
+summary(sites)
+ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = dox))
+ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = phy))
+ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = sic))
+ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = sbt))
+
+sites = na.omit(sites)
+data = merge(sites,data)
+data = na.omit(data)
+colnames(data)
+dim(sites)
+save(data, file = "data/data_JSDM_full_new_IMR_2004_2022.Rdata")
