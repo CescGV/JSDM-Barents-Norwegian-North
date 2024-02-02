@@ -5,7 +5,7 @@ set.seed(1)
 #four chains of the models and join it into 1 Hmsc object
 library(raster)
 library(Hmsc)
-load("models_bio_yes_sic_spatial_rl1.RData")
+load("fitted_hmsc_models.RData")
 models.pa = c(models.fitted.cv[[1]][[1]],
               models.fitted.cv[[2]][[1]],
               models.fitted.cv[[3]][[1]],
