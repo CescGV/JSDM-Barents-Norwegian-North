@@ -93,4 +93,4 @@ m2 <-  Hmsc(Y=Yabu, YScale = T, XData = X, XFormula = XFormula,
 
 models <- list(m1, m2)
 modelnames = c("PA_model", "AB_model")
-save(models, modelnames, file = file.path(model.directory, "unfitted new_models_yes_sic_spatial_rl1.Rdata"))
+save(models, modelnames, file = file.path(model.directory, "unfitted_hmsc_model.Rdata"))
