@@ -1,0 +1,57 @@
+### --- 1. Model basic diagnostics plots (without CV) --- ###
+set.seed(1)
+
+## 1.1 Load the model##
+#four chains of the models and join it into 1 Hmsc object
+library(raster)
+library(Hmsc)
+load("models_bio_yes_sic_spatial_rl1.RData")
+models.pa = c(models.fitted.cv[[1]][[1]],
+              models.fitted.cv[[2]][[1]],
+              models.fitted.cv[[3]][[1]],
+              models.fitted.cv[[4]][[1]])
+models.ab = c(models.fitted.cv[[1]][[2]],
+              models.fitted.cv[[2]][[2]],
+              models.fitted.cv[[3]][[2]],
+              models.fitted.cv[[4]][[2]])
+models = list(models.pa, models.ab)
+
+OmegaCor=computeAssociations(models.pa)
+supportLevel=0.95
+
+toPlot=((OmegaCor[[1]]$support>supportLevel) +(OmegaCor[[1]]$support<(1-supportLevel))>0)*OmegaCor[[1]]$mean
+
+pdf("associations.pdf", height = 20, width = 20)
+corrplot::corrplot(toPlot,method="color", col=colorRampPalette(c("blue","white","red"))(200), tl.cex=.6,tl.col="black", title=paste("randomeffectlevel:",models.pa$rLNames[1]),mar=c(0,0,1,0))
+dev.off()
+
+## 1.2 Calculate the convergence of the estimates
+ma.b = NULL
+ma.g = NULL
+
+mpost.PA = convertToCodaObject(models[[1]])
+mpost.cpue = convertToCodaObject(models[[2]])
+
+es.beta.pa  = effectiveSize(mpost.PA$Beta)
+es.beta.cpue = effectiveSize(mpost.cpue$Beta)
+es.gamma.PA = effectiveSize(mpost.PA$Gamma)
+es.gamma.cpue = effectiveSize(mpost.cpue$Gamma)
+
+es = cbind(es.beta.pa, es.beta.cpue,es.gamma.PA,es.gamma.cpue)
+
+for(m in 1:length(models)){
+    mpost = convertToCodaObject(models[[m]])
+    psrf.beta = gelman.diag(mpost$Beta,
+                            multivariate=FALSE)$psrf
+    psrf.gamma = gelman.diag(mpost$Gamma,
+                             multivariate = F)$psrf
+    tmp.b = summary(psrf.beta)
+    tmp.g = summary(psrf.gamma)   
+    ma.b = cbind(ma.b, psrf.beta)
+    ma.g = cbind(ma.g,psrf.gamma)
+}
+
+summary(ma.b)
+summary(ma.g)
+
+ma = list(ma.b, ma.g, es
