@@ -1,0 +1,1022 @@
+## Result processing and Figures
+## Library
+
+library(raster)
+library(sf)
+library(viridis)
+library(tidyverse)
+library(readxl)
+library(ozmaps) 
+library(grid)
+library(gt)
+library(gridExtra)
+
+## Data output of JSDM crossval
+cv_mean = read.csv("cv_mean.csv")[,-1]
+traits = read.csv("data/Species_traits.csv")
+
+# Selected species for biomass analysis, R2 > 0.05
+cv_sel = cv_mean[cv_mean$mean.R2 >0.05,]
+
+### -- Result 1: Species richness change-- ### #####
+
+# Richness projections can be with lon lat cells (easier for correlation)
+## Shapefile of World countries 
+countries = rgdal::readOGR("Env data/Shape/world_countries.shp")
+
+extent(countries)
+
+countries = raster::crop(countries,raster::extent(-12, 55, 46, 84))
+countries2 <- st_as_sf(countries)
+countries2 = st_union(countries2)
+
+#Function to plot richness
+plot_rich_diff = function(X){
+  ggplot() + 
+    geom_tile(data = X, aes(x, y = y, fill = value), width = 1)+
+    geom_sf(data = countries2) +
+    #geom_polygon(data = countries, aes(long, lat, group = group)) +
+    xlim(-7, 52) +
+    ylim(48,83)+
+    scale_fill_viridis(na.value = "transparent") +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5, size = 10),
+          plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"))+  
+    ylab("Latitude")+
+    xlab("Longitude") + 
+    ggspatial::annotation_north_arrow(
+      which_north = "true",location = "br",
+      height = unit(0.1, "npc"),
+      width =  unit(0.13, "npc"))
+}
+
+## Species richness
+## Richness_1.tiff and Dominance.tiff are an output of the HMSC predictions script
+rich = stack("Richness_1.tiff")
+years <- c(seq(2030, 2100, by = 10),2010)
+scenarios <- c(126, 245, 585)
+
+combinations <- paste0(rep(years, each = length(scenarios)), "_", rep(scenarios, times = length(years)))
+names(rich) = combinations
+
+diff1 = ((rich[[07]] - rich[[25]]) / rich[[25]]) * 100
+diff2 = ((rich[[08]] - rich[[25]]) / rich[[25]]) * 100
+diff3 = ((rich[[09]] - rich[[25]]) / rich[[25]]) * 100
+diff4 = ((rich[[22]] - rich[[25]]) / rich[[25]]) * 100
+diff5 = ((rich[[23]] - rich[[25]]) / rich[[25]]) * 100
+diff6 = ((rich[[24]] - rich[[25]]) / rich[[25]]) * 100
+
+diff1 = data.frame(coordinates(diff1), value = values(diff1))
+diff2 = data.frame(coordinates(diff2), value = values(diff2))
+diff3 = data.frame(coordinates(diff3), value = values(diff3))
+diff4 = data.frame(coordinates(diff4), value = values(diff4))
+diff5 = data.frame(coordinates(diff5), value = values(diff5))
+diff6 = data.frame(coordinates(diff6), value = values(diff6))
+
+## Increases in richness
+lapply(list(diff1$value,diff2$value,diff3$value,diff4$value,diff5$value,diff6$value), t.test)
+
+## Plotting
+diff0 = rich[[25]]
+diff1 = rich[[07]]
+diff2 = rich[[08]]
+diff3 = rich[[09]]
+diff4 = rich[[22]]
+diff5 = rich[[23]]
+diff6 = rich[[24]]
+
+diff0 = data.frame(coordinates(diff0), value = values(diff0))
+diff1 = data.frame(coordinates(diff1), value = values(diff1))
+diff2 = data.frame(coordinates(diff2), value = values(diff2))
+diff3 = data.frame(coordinates(diff3), value = values(diff3))
+diff4 = data.frame(coordinates(diff4), value = values(diff4))
+diff5 = data.frame(coordinates(diff5), value = values(diff5))
+diff6 = data.frame(coordinates(diff6), value = values(diff6))
+
+rich0 = plot_rich_diff(diff0) + ggtitle("Present day") + scale_fill_viridis(name = "Richness",na.value = "transparent", limits = c(3, 22)) 
+rich1 = plot_rich_diff(diff1) + ggtitle("2050     SSP1-2.6") + scale_fill_viridis(name = "Richness",na.value = "transparent") 
+rich2 = plot_rich_diff(diff2) + ggtitle("2050     SSP2-4.5") + scale_fill_viridis(name = "Richness",na.value = "transparent") 
+rich3 = plot_rich_diff(diff3) + ggtitle("2050     SSP5-8.5") + scale_fill_viridis(name = "Richness",na.value = "transparent") #,#limits = c(-20,50), breaks = c(-20,0,25,50)) 
+rich4 = plot_rich_diff(diff4) + ggtitle("SSP1-2.6 (+1.6°C)") + scale_fill_viridis(name = "Richness",na.value = "transparent", limits = c(3, 22)) #,#limits = c(-20,40), breaks = c(-20,0,20,40)) 
+rich5 = plot_rich_diff(diff5) + ggtitle("SSP2-4.5 (+2.6°C)") + scale_fill_viridis(name = "Richness",na.value = "transparent", limits = c(3, 22)) #,#limits = c(-20,80), breaks = c(0,25,50,75,100)) 
+rich6 = plot_rich_diff(diff6) + ggtitle("SSP5-8.5 (+4.5°C)") + scale_fill_viridis(name = "Richness",na.value = "transparent", limits = c(3, 22)) #,#limits = c(-20,120)) 
+
+r2050 = ggpubr::ggarrange(rich1, rich2, rich3, ncol = 3, common.legend = T, legend = "right") #, top = textGrob("2050 - Historic", gp=gpar(fontsize=15,font=8)))
+r2100 = ggpubr::ggarrange(rich4, rich5, rich6, ncol = 3, common.legend = T, legend = "right") #, top = textGrob("2100 - Historic", gp=gpar(fontsize=15,font=8)))
+
+## Dominance
+domin = stack("Dominance.tiff")
+
+diff0.dom = domin[[25]]
+diff1.dom = domin[[07]]
+diff2.dom = domin[[08]]
+diff3.dom = domin[[09]]
+diff4.dom = domin[[22]]
+diff5.dom = domin[[23]]
+diff6.dom = domin[[24]]
+
+diff0.dom = data.frame(coordinates(diff0.dom), value = values(diff0.dom))
+diff1.dom = data.frame(coordinates(diff1.dom), value = values(diff1.dom))
+diff2.dom = data.frame(coordinates(diff2.dom), value = values(diff2.dom))
+diff3.dom = data.frame(coordinates(diff3.dom), value = values(diff3.dom))
+diff4.dom = data.frame(coordinates(diff4.dom), value = values(diff4.dom))
+diff5.dom = data.frame(coordinates(diff5.dom), value = values(diff5.dom))
+diff6.dom = data.frame(coordinates(diff6.dom), value = values(diff6.dom))
+
+rich0.dom = plot_rich_diff(diff0.dom) + ggtitle("Present day") + scale_fill_viridis(name = "Dominance(%)",na.value = "transparent", limits = c(15,96)) 
+rich1.dom = plot_rich_diff(diff1.dom) + ggtitle("2050     SSP1-2.6") + scale_fill_viridis(name = "H index",na.value = "transparent",limits = c(15,96)) 
+rich2.dom = plot_rich_diff(diff2.dom) + ggtitle("2050     SSP2-4.5") + scale_fill_viridis(name = "H index",na.value = "transparent",limits = c(15,96)) 
+rich3.dom = plot_rich_diff(diff3.dom) + ggtitle("2050     SSP5-8.5") + scale_fill_viridis(name = "H index",na.value = "transparent",limits = c(15,96)) 
+rich4.dom = plot_rich_diff(diff4.dom) + ggtitle("SSP1-2.6 (+1.6°C)") + scale_fill_viridis(name = "Dominance (%)",na.value = "transparent",limits = c(15,96)) 
+rich5.dom = plot_rich_diff(diff5.dom) + ggtitle("SSP2-4.5 (+2.6°C)") + scale_fill_viridis(name = "Dominance (%)",na.value = "transparent",limits = c(15,96))
+rich6.dom = plot_rich_diff(diff6.dom) + ggtitle("SSP5-8.5 (+4.5°C)") + scale_fill_viridis(name = "Dominance (%)",na.value = "transparent",limits = c(15,96)) 
+
+r2050.dom = ggpubr::ggarrange(rich1.dom, rich2.dom, rich3.dom, ncol = 3, common.legend = T, legend = "right") #, top = textGrob("2050 - Historic", gp=gpar(fontsize=15,font=8)))
+r2100.dom = ggpubr::ggarrange(rich4.dom, rich5.dom, rich6.dom, ncol = 3, common.legend = T, legend = "right") #, top = textGrob("2100 - Historic", gp=gpar(fontsize=15,font=8)))
+
+pdf("Dominance_change.pdf", width = 15, height = 9)
+ggpubr::ggarrange(rich0.dom, 
+                  rich4.dom + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  rich5.dom + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  rich6.dom + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  align = "hv",
+                  nrow = 1, ncol = 4, common.legend = TRUE, legend="bottom")
+dev.off()
+
+pdf("Richness_change.pdf", width = 15, height = 9)
+ggpubr::ggarrange(rich0, 
+                  rich4 + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  rich5 + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  rich6 + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  align = "hv",
+                  nrow = 1, ncol = 4, common.legend = TRUE, legend="bottom")
+
+ggpubr::ggarrange(rich4 + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  rich5 + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  rich6 + ylab("") + theme(axis.text.y=element_blank(), axis.ticks.y=element_blank()),
+                  align = "hv",
+                  nrow = 1, ncol = 4, common.legend = TRUE, legend="bottom")
+dev.off()
+
+## Final Figure 2
+pdf("Richness_dom.pdf", width = 15, height = 9)
+ggpubr::ggarrange(ggpubr::ggarrange(rich0,r2100,widths = c(1.3, 2)),
+                  ggpubr::ggarrange(rich0.dom,r2100.dom,widths = c(1.3, 2)),
+                  nrow = 2)
+dev.off()
+
+### -- Result 2: Species' area change with time -- ### #####
+## centroid_distribution.csv is an output of the HMSC predictions script
+
+dat = read.csv("centroid_distribution.csv")[,-1]
+dat = separate(data = dat, col = Time, 
+               into = c("Year", "Scenario"),
+               sep = "_")
+
+dat$Area = dat$Area * 1205.82
+dat$Year = as.numeric(dat$Year)
+dat = dat %>% arrange(Year) %>% group_by(Scenario,Species, Var) %>% 
+  mutate(Area_percent = (Area/first(Area)) * 100,
+         CPUE_percent = (CPUE/first(CPUE)) * 100)
+
+head(dat)
+
+dat_sel = dat %>% filter(Species %in% cv_sel$Sp)
+
+
+## Fit LR to each species habitat across the three points o time 
+sl.hab = dat %>%filter(Var == "PA") %>%
+  group_by(Species, Scenario, Var) %>% 
+  do(broom::tidy(lm(Area_percent ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) %>%
+  mutate(Var1 = "Habitat area")
+
+sl.hab.core = dat_sel %>% filter(Var == "bestcpuehab") %>%
+  group_by(Species, Scenario, Var) %>%
+  do(broom::tidy(lm(Area_percent ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) %>%
+  mutate(Var1 = "Core Habitat area")
+
+sl.cpue = dat_sel %>% filter(Var == "cpuehab") %>%
+  group_by(Species, Scenario, Var) %>%
+  do(broom::tidy(lm(CPUE_percent ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) %>%
+  mutate(Var1 = "CPUE")
+
+sl.cpue.core = dat_sel %>% filter(Var == "bestcpuehab") %>%
+  group_by(Species, Scenario, Var) %>%
+  do(broom::tidy(lm(CPUE_percent ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate,Var) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) %>%
+  mutate(Var1 = "Core CPUE")
+
+sl = rbind(sl.hab, sl.cpue, sl.hab.core, sl.cpue.core)
+
+## Differences between scenarios
+
+summary(lm(sl.hab$Year~sl.hab$Scenario)) 
+summary(lm(sl.cpue$Year~sl.cpue$Scenario))
+summary(lm(sl.hab.core$Year~sl.cpue$Scenario))
+summary(lm(sl.cpue.core$Year~sl.cpue$Scenario))
+## SSP5-8.5 always higher
+
+## Statistical tests for differences to 0.
+## Unsignificant changes in all scenarios 
+by(sl.hab, sl.hab$Scenario, function(sub_df) {
+  t_test_result <- wilcox.test(sub_df$Year)
+  return(t_test_result)
+})
+
+by(sl.cpue, sl.cpue$Scenario, function(sub_df) {
+  t_test_result <- wilcox.test(sub_df$Year)
+  return(t_test_result)
+})
+
+by(sl.hab.core, sl.hab.core$Scenario, function(sub_df) {
+  t_test_result <- wilcox.test(sub_df$Year)
+  return(t_test_result)
+})
+
+by(sl.cpue.core, sl.cpue.core$Scenario, function(sub_df) {
+  t_test_result <- wilcox.test(sub_df$Year)
+  return(t_test_result)
+})
+
+# Color palette
+cols = colortools::triadic("mediumpurple3")
+sl$Scenario = as.factor(sl$Scenario)
+levels(sl$Scenario) = c("SSP1-1.26", "SSP2-4.5", "SSP5-8.5")
+
+a = ggplot(sl[sl$Var1 == "Habitat area",]) +
+  geom_boxplot(aes( x = Scenario,y = Year, fill = Scenario)) +
+  #geom_histogram(aes(y = ..density..)) +
+  #geom_density() + 
+  scale_fill_manual(values = cols) +
+  #facet_wrap(~ Scenario) +
+  theme_bw() +
+  geom_text(x=1, y=8000, label="*", size = 10) + 
+  geom_text(x=2, y=8000, label="*", size = 10) + 
+  geom_text(x=3, y=8000, label="*", size = 10) + 
+  theme(legend.position = "none") +
+  geom_hline(yintercept=0, linetype="dashed") +
+  labs(title = "(A)",
+       x = "",
+       y = "Geographic range change (%area/yr)")
+
+
+b = ggplot(sl[sl$Var1 == "CPUE",]) +
+  geom_boxplot(aes( x = Scenario,y = Year, fill = Scenario)) +
+  #geom_histogram(aes(y = ..density..)) +
+  #geom_density() + 
+  scale_fill_manual(values = cols) +
+  geom_text(x=1, y=6000, label="*", size = 10) + 
+  geom_text(x=2, y=6000, label="*", size = 10) + 
+  geom_text(x=3, y=6000, label="*", size = 10) + 
+  #facet_wrap(~ Scenario) +
+  theme_bw() + 
+  geom_hline(yintercept=0, linetype="dashed") +
+  #theme(legend.position = "none") +
+  labs(title = "(B)",
+       x = "",
+       y = "Biomass change (% CPUE/yr)")
+
+c = ggplot(sl[sl$Var1 == "Core Habitat area",]) +
+  geom_boxplot(aes( x = Scenario,y = Year, fill = Scenario)) +
+  #geom_histogram(aes(y = ..density..)) +
+  #geom_density() + 
+  scale_fill_manual(values = cols) +
+  #facet_wrap(~ Scenario) +
+  theme_bw() + 
+  geom_hline(yintercept=0, linetype="dashed") +
+  #theme(legend.position = "none") +
+  labs(title = "(C)",
+       x = "",
+       y = "Core range change (% area/yr)") 
+
+
+d = ggplot(sl[sl$Var1 == "Core CPUE",]) +
+  geom_boxplot(aes( x = Scenario,y = Year, fill = Scenario)) +
+  #geom_histogram(aes(y = ..density..)) +
+  #geom_density() + 
+  scale_fill_manual(values = cols) +
+  #facet_wrap(~ Scenario) +
+  theme_bw() + 
+  geom_hline(yintercept=0, linetype="dashed") +
+  #theme(legend.position = "none") +
+  labs(title = "(D)",
+       x = "",
+       y = "Core biomass change (% CPUE/yr)") 
+
+
+pdf("habitat_and_core_habitat_time_vert.pdf",height = 11, width = 4)
+ggpubr::ggarrange(a + theme(axis.title = element_text(size = 15)),
+                  b + theme(axis.title = element_text(size = 15)),
+                  c + theme(axis.title = element_text(size = 15)), 
+                  d + theme(axis.title = element_text(size = 15)), 
+                  
+                  ncol=2, nrow=2,
+                  common.legend = TRUE,legend="bottom",
+                  align = "hv")
+dev.off()
+
+### -- Traits and species changes
+
+sl$Species =  gsub('[.]',' ',sl$Species)
+sl_t = merge(traits, sl) 
+sl_t= sl_t[!is.na(sl_t$Year),]
+colnames(sl_t)
+
+## Build a MLR with selected ones  # % of change
+
+
+full.model.habitat = lm(Year ~ Zoo_final + DemersPelag + scale(TempPrefMean) + scale(MaxLengthTL) + 
+                          scale(Troph)+ scale(DepthMax)+ scale(Fecundity) + scale(Lm),
+                        data = sl_t[sl_t$Var1 == "Habitat area",])
+
+full.model.cpue = lm(Year ~Zoo_final + DemersPelag + scale(TempPrefMean) + scale(MaxLengthTL) + 
+                       scale(Troph)+ scale(DepthMax) + scale(Lm) + scale(Fecundity),
+                     data = sl_t[sl_t$Var1 == "CPUE",])
+
+full.model.core.area = lm(Year ~ Zoo_final + DemersPelag + scale(TempPrefMean) + scale(MaxLengthTL) + 
+                            scale(Troph) + scale(DepthMax) + scale(Fecundity) + scale(Lm), 
+                          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+
+full.model.core.cpue = lm(Year ~Zoo_final + DemersPelag + scale(TempPrefMean) + scale(MaxLengthTL) + 
+                            scale(Troph)+ scale(DepthMax) + scale(Lm) + scale(Fecundity),
+                          data = sl_t[sl_t$Var1 == "Core CPUE",])
+
+### Habitat model
+summary(full.model.habitat) # I drop TempPref 
+
+mod1 = lm(Year ~ Zoo_final + DemersPelag + scale(Fecundity) + scale(MaxLengthTL) + 
+            Troph+ scale(DepthMax) + scale(Lm),
+          data = sl_t[sl_t$Var1 == "Habitat area",])
+summary(mod1) # I drop MaxLength
+
+mod2 = lm(Year ~ Zoo_final + DemersPelag + scale(Fecundity) +
+            Troph+ scale(DepthMax) + scale(Lm),
+          data = sl_t[sl_t$Var1 == "Habitat area",])
+summary(mod2) # I drop Lm
+
+
+mod3 = lm(Year ~ Zoo_final + DemersPelag + scale(Fecundity) +
+            Troph+ scale(DepthMax),
+          data = sl_t[sl_t$Var1 == "Habitat area",])
+summary(mod3) # I drop DepthMax
+
+mod4 = lm(Year ~ Zoo_final + DemersPelag + scale(Fecundity) +
+            Troph,
+          data = sl_t[sl_t$Var1 == "Habitat area",])
+summary(mod4) # Fecundity
+
+mod5 = lm(Year ~ Zoo_final + DemersPelag +
+            Troph,
+          data = sl_t[sl_t$Var1 == "Habitat area",])
+summary(mod5) # Demerspelag
+
+mod6 = lm(Year ~ Zoo_final+
+            Troph,
+          data = sl_t[sl_t$Var1 == "Habitat area",])
+sjPlot::plot_model(mod6, type = "pred", terms = "Troph", show.data = T)
+
+best.model.habitat = lm(Year ~Zoo_final + Troph,
+                     data = sl_t[sl_t$Var1 == "Habitat area",])
+
+## CPUE model
+summary(full.model.cpue)# I drop Fecundity
+
+mod1 = lm(Year ~ Zoo_final + DemersPelag + scale(TempPrefMean) + scale(MaxLengthTL) + 
+            scale(Troph)+ scale(DepthMax) + scale(Lm),
+          data = sl_t[sl_t$Var1 == "CPUE",])
+
+summary(mod1) # I drop TempPrefMean
+
+mod2 = lm(Year ~ Zoo_final + DemersPelag + scale(MaxLengthTL) + 
+            scale(Troph)+ scale(DepthMax) + scale(Lm),
+          data = sl_t[sl_t$Var1 == "CPUE",])
+
+summary(mod2) # I drop DepthMax
+mod3 = lm(Year ~Zoo_final + DemersPelag + scale(MaxLengthTL) + 
+            scale(Troph)+  scale(Lm),
+          data = sl_t[sl_t$Var1 == "CPUE",])
+summary(mod3) # I drop dempel
+mod4 = lm(Year ~Zoo_final +scale(MaxLengthTL) + 
+            scale(Troph)+  scale(Lm),
+          data = sl_t[sl_t$Var1 == "CPUE",])
+
+summary(mod4) # I drop Troph
+mod5 = lm(Year ~Zoo_final +scale(MaxLengthTL) +  scale(Lm),
+          data = sl_t[sl_t$Var1 == "CPUE",])
+
+summary(mod5)
+
+sjPlot::plot_model(mod5, type = "pred", terms = "Lm", show.data = T)
+sjPlot::plot_model(mod5, type = "pred", terms = "MaxLengthTL", show.data = T)
+
+plot(mod5)
+
+best.model.cpue = lm(Year ~Zoo_final +scale(MaxLengthTL) +  scale(Lm),
+                      data = sl_t[sl_t$Var1 == "CPUE",])
+
+## Core habitat model 
+
+summary(full.model.core.area) # I drop MaxLength
+mod1 = lm(Year ~ Zoo_final + DemersPelag + scale(TempPrefMean) + 
+            scale(Troph)+ scale(DepthMax)+ scale(Fecundity) + scale(Lm),
+          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+summary(mod1) # I drop Fecundity
+
+mod2 = lm(Year ~ Zoo_final + DemersPelag + scale(TempPrefMean) +
+            scale(Troph) + scale(DepthMax) + scale(Lm), 
+          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+summary(mod2) # I drop Lm
+mod3 = lm(Year ~ Zoo_final + DemersPelag + scale(TempPrefMean) +
+            scale(Troph) + scale(DepthMax), 
+          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+summary(mod3) # I drop Demersal Pelagic
+mod4 = lm(Year ~ Zoo_final +  scale(TempPrefMean) +
+            scale(Troph) + scale(DepthMax), 
+          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+summary(mod4) # Drop Troph
+
+mod5 = lm(Year ~ Zoo_final + scale(DepthMax) + scale(TempPrefMean), 
+          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+summary(mod5) # I drop temprefMean
+mod6 = lm(Year ~ Zoo_final + scale(DepthMax), 
+          data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+summary(mod6)
+
+sjPlot::plot_model(mod6, type = "pred", terms = "DepthMax", show.data = T)
+
+best.model.core.area = lm(Year ~ Zoo_final + DepthMax, 
+                     data = sl_t[sl_t$Var1 == "Core Habitat area",])
+
+## Core CPUE model
+
+summary(full.model.core.cpue) # Drop Depth Max
+
+m1 = lm(Year ~Zoo_final + DemersPelag + scale(TempPrefMean) + scale(MaxLengthTL) + 
+     scale(Troph)+ scale(Lm) + scale(Fecundity),
+   data = sl_t[sl_t$Var1 == "Core CPUE",])
+
+summary(m1) # Drop DemPel
+m2 = lm(Year ~Zoo_final + scale(Troph) + scale(TempPrefMean) + scale(MaxLengthTL) + 
+          scale(Lm) + scale(Fecundity),
+        data = sl_t[sl_t$Var1 == "Core CPUE",])
+summary(m2) # Drop Troph
+m3 = lm(Year ~Zoo_final + scale(TempPrefMean) + scale(MaxLengthTL) + 
+          scale(Lm) + scale(Fecundity),
+        data = sl_t[sl_t$Var1 == "Core CPUE",])
+summary(m3)# Drop Max Length
+
+m4 = lm(Year ~Zoo_final + scale(TempPrefMean) +
+          scale(Lm) + scale(Fecundity),
+        data = sl_t[sl_t$Var1 == "Core CPUE",])
+summary(m4) # Drop Lm
+
+m5 = lm(Year ~Zoo_final + scale(TempPrefMean) +
+          scale(Fecundity),
+        data = sl_t[sl_t$Var1 == "Core CPUE",])
+summary(m5) # Drop Fecundity
+m6 = lm(Year ~Zoo_final + scale(TempPrefMean),
+        data = sl_t[sl_t$Var1 == "Core CPUE",])
+summary(m6) # Drop TempPrefMean
+
+m7= lm(Year ~Zoo_final,
+        data = sl_t[sl_t$Var1 == "Core CPUE",])
+summary(m7) # Drop TempPrefMean
+
+best.model.core.cpue = m7
+
+summary(best.model.habitat)
+summary(best.model.cpue)
+summary(best.model.core.area)
+summary(best.model.core.cpue)
+
+par(mfrow = c(3,1))
+plot(effects::allEffects(best.model.habitat)[[1]])
+plot(effects::allEffects(best.model.habitat)[[2]])
+plot(effects::allEffects(best.model.best)[[1]])
+plot(effects::allEffects(best.model.cpue)[[1]])
+
+a = sjPlot::plot_model(best.model.habitat) + ggtitle("(A)")
+b = sjPlot::plot_model(best.model.cpue)+ ggtitle("(B)")
+c = sjPlot::plot_model(best.model.core.area)+ ggtitle("(c)")
+d = sjPlot::plot_model(best.model.core.cpue)+ ggtitle("(c)")
+
+pdf("traits.pdf", width = 15)
+gridExtra::grid.arrange(a,b,c,ncol = 3)
+dev.off()
+
+sl_t$Scenario = as.factor(sl_t$Scenario)
+levels(sl_t$Scenario) = c("SSP1-2.6","SSP2-4.5","SSP5-8.5")
+colortools::setColors("#3D6DCC", 6)
+
+pdf("Figure_6_biogeography_vs_area.pdf", height = 8)
+a = ggplot(sl_t[sl_t$Var1 == "Habitat area",])  +
+  geom_boxplot(aes(x = Zoo_final, y = Year, fill = Zoo_final), alpha = 0.8) + 
+  scale_fill_manual(values = setColors("#3D6DCC", 6))+ theme_bw() +
+  facet_wrap(.~Scenario)+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())  + 
+  geom_hline(yintercept=0, linetype="dashed") +
+  labs(fill="Zoogeography") +
+  xlab("")+
+  ylab("Range change (%area/yr)") + 
+  ggtitle("(A)")
+
+b = ggplot(sl_t[sl_t$Var1 == "CPUE",])  +
+  geom_boxplot(aes(x = Zoo_final, y = Year, fill = Zoo_final), alpha = 0.8) + 
+  scale_fill_manual(values = setColors("#3D6DCC", 6))+ theme_bw() +
+  facet_wrap(.~Scenario)+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())  + 
+  geom_hline(yintercept=0, linetype="dashed") +
+  ylab("Biomass change(%CPUE/yr)")+
+  xlab("")+
+  labs(fill="Zoogeography") +
+  ggtitle("(B)")
+
+c = ggplot(sl_t[sl_t$Var1 == "Core Habitat area",]) +
+  geom_boxplot(aes(x = Zoo_final, y = Year, fill = Zoo_final), alpha = 0.8) + 
+  scale_fill_manual(values = setColors("#3D6DCC", 6))+ theme_bw() +
+  facet_wrap(.~Scenario)+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())  +
+  geom_hline(yintercept=0, linetype="dashed") +
+  labs(fill="Zoogeography") +
+  xlab("")+
+  ylab("Core range change (%area/yr)") + 
+  ggtitle("(C)")
+
+d = ggplot(sl_t[sl_t$Var1 == "Core CPUE",]) + 
+  geom_boxplot(aes(x = Zoo_final, y = Year, fill = Zoo_final), alpha = 0.8) + 
+  scale_fill_manual(values = setColors("#3D6DCC", 6))+ theme_bw() +
+  facet_wrap(.~Scenario)+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())  +
+  geom_hline(yintercept=0, linetype="dashed") +
+  labs(fill="Zoogeography") +
+  xlab("")+
+  ylab("Biomass change (%CPUE/yr") + 
+  ggtitle("(D)")
+
+ggpubr::ggarrange(a,b,c,d, ncol=1, nrow=4, common.legend = TRUE,legend="bottom")
+dev.off()
+### -- Result 4: Species' connectivity -- ### #####
+
+conn = read.csv("connectivity.csv")[,-1] %>% filter(Estimate == "habitat")
+head(conn)
+conn$dist = conn$dist/1000 # Distance in km
+conn$areap = conn$areap/100000 # Area in km2
+
+unique(conn$ListName)
+
+conn = separate(conn,ListName, into = c("Year", "Scenario"), sep = "_")
+conn$Year = as.numeric(conn$Year)
+ggplot(conn) + 
+  geom_boxplot(aes(x = Year, y = dist, group = Year), alpha = 0.5) + 
+  facet_wrap(.~Scenario)
+
+# Interactions are not significant, but without interactions, some things are
+
+mod_npol = lm(npol ~ as.factor(Year) + Scenario,data = conn) 
+mod_dist = lm(dist ~ as.factor(Year) + Scenario,data = conn)  
+mod_area = lm(areap~ as.factor(Year) + Scenario,data= conn) 
+
+summary(lm(npol ~ Year + Scenario,data = conn))  
+summary(lm(dist ~ Year + Scenario,data = conn))  
+summary(lm(areap ~ Year + Scenario,data = conn)) 
+
+a = sjPlot::plot_model(mod_npol, terms = c("Year", "Scenario"), type = "pred")
+b = sjPlot::plot_model(mod_dist, terms = c("Year", "Scenario"), type = "pred")
+c = sjPlot::plot_model(mod_area, terms = c("Year", "Scenario"), type = "pred")
+
+plot = ggpubr::ggarrange(a,b,c, ncol=3, nrow=1, 
+                  common.legend = TRUE,
+                  legend="bottom")
+
+ggpubr::annotate_figure(plot,
+                        top = ggpubr::text_grob("Connectivity measures",
+                                                face = "bold", size = 14))
+
+conn_lm_area = na.omit(conn) %>%
+  group_by(Species, Scenario) %>% 
+  dplyr::do(broom::tidy(lm(areap ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) 
+
+conn_lm_npol = na.omit(conn) %>%
+  group_by(Species, Scenario) %>% 
+  dplyr::do(broom::tidy(lm(npol ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) 
+ 
+conn_lm_dist = na.omit(conn) %>%
+  group_by(Species, Scenario) %>% 
+  dplyr::do(broom::tidy(lm(dist ~ Year, data = .))) %>%
+  dplyr::select(Species, Scenario, term, estimate) %>%
+  pivot_wider(names_from = term, values_from = c(estimate)) 
+
+boxplot(conn_lm_dist$Year[conn_lm_dist$Scenario == "126"])
+boxplot(conn_lm_npol$Year[conn_lm_npol$Scenario == "126"])
+boxplot(conn_lm_area$Year[conn_lm_area$Scenario == "126"])
+boxplot(conn_lm_area$Year[conn_lm_area$Scenario == "585"])
+
+wilcox.test(conn_lm_dist$Year[conn_lm_dist$Scenario == "126"])
+wilcox.test(conn_lm_dist$Year[conn_lm_dist$Scenario == "245"])
+wilcox.test(conn_lm_dist$Year[conn_lm_dist$Scenario == "585"])
+wilcox.test(conn_lm_npol$Year[conn_lm_npol$Scenario == "126"])
+wilcox.test(conn_lm_npol$Year[conn_lm_npol$Scenario == "245"])
+wilcox.test(conn_lm_npol$Year[conn_lm_npol$Scenario == "585"])
+wilcox.test(conn_lm_area$Year[conn_lm_area$Scenario == "126"])
+wilcox.test(conn_lm_area$Year[conn_lm_area$Scenario == "245"])
+wilcox.test(conn_lm_area$Year[conn_lm_area$Scenario == "585"])
+wilcox.test(conn_lm_area$Year[conn_lm_area$Scenario == "585"])
+
+cols = colortools::triadic("mediumpurple3")
+conn_lm_area$Scenario = as.factor(conn_lm_area$Scenario)
+levels(conn_lm_area$Scenario) = c("SSP1-2.6 (+1.6°C)","SSP2-4.5 (+2.6°C)","SSP5-8.5 (+4.5°C)")
+
+conn_lm_npol$Scenario = as.factor(conn_lm_area$Scenario)
+levels(conn_lm_npol$Scenario) = c("SSP1-2.6 (+1.6°C)","SSP2-4.5 (+2.6°C)","SSP5-8.5 (+4.5°C)")
+
+conn_lm_dist$Scenario = as.factor(conn_lm_area$Scenario)
+levels(conn_lm_dist$Scenario) = c("SSP1-2.6 (+1.6°C)","SSP2-4.5 (+2.6°C)","SSP5-8.5 (+4.5°C)")
+
+areaplot = ggplot(conn_lm_area, aes(x = Year, fill = Scenario)) +
+  geom_histogram() + 
+  scale_fill_manual(values = cols) +
+  facet_wrap(~ Scenario, scales = "free_x") +
+  theme_bw() + 
+  labs(title = "(A) Polygon area",
+       x = "",
+       y = "Number of species") 
+
+npolplot = ggplot(conn_lm_npol, aes(x = Year, fill = Scenario)) +
+  geom_histogram() +
+  scale_fill_manual(values = cols) +
+  facet_wrap(~ Scenario, scales = "free_x") +
+  theme_bw() + 
+  labs(title = "(B) Number of polygons",
+       x = "",
+       y = "Number of species") 
+
+distplot = ggplot(conn_lm_dist, aes(x = Year, fill = Scenario)) +
+  geom_histogram() +
+  scale_fill_manual(values = cols) +
+  facet_wrap(~ Scenario, scales = "free_x") +
+  theme_bw() + 
+  labs(title = "(C) Distance",
+       x = "",
+       y = "Number of species") 
+
+ggpubr::ggarrange(areaplot, npolplot,distplot, ncol=1, nrow=3, 
+                  common.legend = TRUE,
+                  legend="bottom")
+
+pdf("Figure_S2_Connectivity.pdf")
+ggpubr::ggarrange(areaplot, npolplot,distplot, ncol=1, nrow=3, 
+                  common.legend = TRUE,
+                  legend="bottom")
+dev.off()
+### -- Figure 1: Study area -- ### #####
+load( "data/allData.R") # X, Y, Tr & P Dataframes
+load("all_layers.Rdata")
+load("bathy.Rdata")
+
+bathy1 = bathy
+
+bathy1$depth[bathy1$depth>700] = NA
+pdf("Figure1.pdf")
+ggplot() + 
+  geom_tile(data = na.omit(bathy1), aes(x = x, y = y, fill = depth), alpha = 0.8) +
+  geom_point(data = coords, aes(x = Longitude, y = Latitude), 
+             shape = 20, col = "black" ,fill = "black",cex = 0.8)+
+  geom_sf(data = countries2) +
+  xlim(-7, 52) +
+  ylim(48,83) +
+#  scale_color_gradientn(colors = terrain.colors(250)) +
+  scale_fill_gradientn(colours = terrain.colors(6), name = "Depth (m)")+
+  #scale_fill_distiller(name = "Depth (m)" ,palette = "PuBu", direction = 1, na.value = "transparent")+  #scale_fill_gradientn(colors = rev(rainbow(4)))+
+  #paletteer::scale_fill_paletteer_c("viridis::plasma")+
+  #scico::scale_fill_scico(palette = "lajolla",na.value = "transparent", direction = -1)+
+  #scale_fill_viridis(na.value = "transparent", direction = -1) +
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5, size = 10),
+        plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"),
+        axis.title = element_text(size = 15))+  
+  ylab("Latitude")+
+  xlab("Longitude") + 
+  ggspatial::annotation_north_arrow(
+    which_north = "true",location = "br",
+    height = unit(0.1, "npc"),
+    width =  unit(0.13, "npc"))
+
+dev.off()
+### Figure 2, examples CPUE ####
+a.PA.mean = readRDS("predY_mean.rds")
+a.cpue.mean= readRDS("predY_cpue_mean_exp.rds")
+
+load("data/allData.R")
+thresh = apply(Y, 2, function(x)
+  min(x[x!=0])/2)
+
+PA.hab = a.PA.mean
+
+cpue.hab = vector("list", 9)
+for (i in 1:9) {
+  for (k in 1:3){
+    cpue.hab[[i]][[k]] =
+      a.cpue.mean[[i]][[k]] *
+      a.PA.mean[[i]][[k]]
+  }}
+cpue.hab <- lapply(cpue.hab,function(x) lapply(x, threshold_matrix, thresh = thresh))
+
+margin = theme(plot.margin = unit(c(0.05,0.05,0.05,0.05), "cm"))
+get_only_legend <- function(plot) {
+  plot_table <- ggplot_gtable(ggplot_build(plot))
+  legend_plot <- which(sapply(plot_table$grobs, function(x) x$name) == "guide-box")
+  legend <- plot_table$grobs[[legend_plot]]
+  return(legend)
+}
+
+cpue.hab.sel = lapply(cpue.hab, function(Y) lapply(Y,function(X)   
+  X = X[,which(colnames(cpue.hab[[1]][[1]]) %in% cv_sel$Sp)]))  
+
+PA.hab.sel = lapply(PA.hab, function(Y) lapply(Y,function(X)   
+  X = X[,which(colnames(PA.hab[[1]][[1]]) %in% cv_sel$Sp)]))  
+
+arct = traits %>% filter(Zoo_final %in% c("arctic")) %>% select(Species)
+arct = gsub(" ", ".", arct$Species)
+row = which(colnames(PA.hab.sel[[1]][[1]]) %in% arct)  
+
+## Clim corresponds to which element of the list 1:9 = 2030,2040,2050...2100,2010 i want to select.
+## 2050 is the 3rd, 2100 is thr 8th and 2010 is the 9th
+clim = c(3,8,9)
+resu = list()
+resu.b=list()
+
+for (i in 1:length(row)) {
+  e = row[i]
+  res = raster::stack()
+  res.b = raster::stack()
+  for (l in 1:3){
+    k = clim[l]
+    #MpredY   <- PA.hab.sel[[k]][[3]][,e]
+    MpredY.b <- cpue.hab.sel[[k]][[3]][,e]
+    #MpredY.b = MpredY.b * MpredY
+    MpredR   <- all.layers[[1]][[1]][[1]]
+    MpredR.b <- all.layers[[1]][[1]][[1]]
+    values(MpredR)[which(!is.na(values(MpredR)))] <- MpredY
+    values(MpredR.b)[which(!is.na(values(MpredR.b)))] <- MpredY.b
+    names(MpredR) = paste(colnames( PA.hab.sel[[k]][[3]])[e], names(PA.hab.sel[[k]][[3]])[k])
+    names(MpredR.b) = paste(colnames(cpue.hab.sel[[k]][[3]])[e], names(cpue.hab.sel[[k]][[3]])[k],"abu")
+    res = raster::stack(res,MpredR)
+    res.b = raster::stack(res.b,MpredR.b)
+  }
+  resu[[i]] = res
+  resu.b[[i]] = res.b
+  #saveRDS(res, file = paste(names(MpredR), ".rds", sep = ""))
+  #saveRDS(res.b, file = paste(names(MpredR.b), ".rds", sep = ""))
+}
+mean = list()
+for (i in 1:length(resu)){
+  ress_2010 = data.frame(coordinates(resu.b[[i]][[3]]), value = values(resu.b[[i]][[3]]), Year = 2010, sp = i)
+  ress_2050 = data.frame(coordinates(resu.b[[i]][[1]]), value = values(resu.b[[i]][[1]]), Year = 2050, sp = i)
+  ress_2100 = data.frame(coordinates(resu.b[[i]][[2]]), value = values(resu.b[[i]][[2]]), Year = 2100, sp = i)
+  mean[[i]] = rbind(ress_2100 ,ress_2050 ,ress_2010)
+}
+
+mean = do.call(rbind,mean)
+
+mean = mean %>% group_by(x,y,Year) %>% mutate(value = mean(value))
+plot_rich_diff = function(X){
+  ggplot() + 
+    geom_tile(data = X, aes(x, y = y, fill = log(value)), width = 1)+
+    geom_sf(data = countries2) +
+    #geom_polygon(data = countries, aes(long, lat, group = group)) +
+    xlim(-7, 52) +
+    ylim(48,83)+
+    scale_fill_viridis(na.value = "transparent") +
+    theme_bw() + 
+    theme(plot.title = element_text(hjust = 0.5, size = 10),
+          plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"))+  
+    ylab("Latitude")+
+    xlab("Longitude") + 
+    ggspatial::annotation_north_arrow(
+      which_north = "true",location = "br",
+      height = unit(0.1, "npc"),
+      width =  unit(0.13, "npc"))
+}
+range(log(mean$value),na.rm = T)
+mean = na.omit(mean)
+mean$value[log(mean$value) < -11] = NA
+ar0 = plot_rich_diff(mean[mean$Year == 2010,]) + scale_fill_viridis(name = "Log(CPUE)",limits = c(-6,9), na.value = "darkgrey")+xlab("")
+ar1 = plot_rich_diff(mean[mean$Year == 2010,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-6,9))+theme(legend.position = "none") +xlab("")
+ar2 = plot_rich_diff(mean[mean$Year == 2050,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-6,9))+theme(legend.position = "none") +xlab("")+ ylab("")
+ar3 = plot_rich_diff(mean[mean$Year == 2100,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-6,9))+theme(legend.position = "none") +xlab("")+ ylab("")
+
+legend.ar = get_only_legend(ar0)
+
+ar = gridExtra::grid.arrange(ar1,ar2,ar3, ncol = 3)
+
+arctic = gridExtra::grid.arrange(ar, legend.ar, ncol = 2, widths = c(8,1), 
+                        top = grid::textGrob("(A)", x = 0, hjust = 0))
+
+## Arctic boreal
+
+arbor = traits %>% filter(Zoo_final %in% c("arctic-boreal")) %>% select(Species)
+arbor = gsub(" ", ".", arbor$Species)
+row = which(colnames(PA.hab.sel[[1]][[1]]) %in% arbor)  
+
+## Clim corresponds to which element of the list 1:9 = 2030,2040,2050...2100,2010 i want to select.
+## 2050 is the 3rd, 2100 is thr 8th and 2010 is the 9th
+clim = c(3,8,9)
+resu = list()
+resu.b=list()
+
+for (i in 1:length(row)) {
+  e = row[i]
+  res = raster::stack()
+  res.b = raster::stack()
+  for (l in 1:3){
+    k = clim[l]
+    MpredY   <- PA.hab.sel[[k]][[3]][,e]
+    MpredY.b <- cpue.hab.sel[[k]][[3]][,e]
+    MpredY.b = MpredY.b * MpredY
+    MpredR   <- all.layers[[1]][[1]][[1]]
+    MpredR.b <- all.layers[[1]][[1]][[1]]
+    values(MpredR)[which(!is.na(values(MpredR)))] <- MpredY
+    values(MpredR.b)[which(!is.na(values(MpredR.b)))] <- MpredY.b
+    names(MpredR) = paste(colnames( PA.hab.sel[[k]][[3]])[e], names(PA.hab.sel[[k]][[3]])[k])
+    names(MpredR.b) = paste(colnames(cpue.hab.sel[[k]][[3]])[e], names(cpue.hab.sel[[k]][[3]])[k],"abu")
+    res = raster::stack(res,MpredR)
+    res.b = raster::stack(res.b,MpredR.b)
+  }
+  resu[[i]] = res
+  resu.b[[i]] = res.b
+  #saveRDS(res, file = paste(names(MpredR), ".rds", sep = ""))
+  #saveRDS(res.b, file = paste(names(MpredR.b), ".rds", sep = ""))
+}
+mean = list()
+for (i in 1:length(resu)){
+  ress_2010 = data.frame(coordinates(resu.b[[i]][[3]]), value = values(resu.b[[i]][[3]]), Year = 2010, sp = i)
+  ress_2050 = data.frame(coordinates(resu.b[[i]][[1]]), value = values(resu.b[[i]][[1]]), Year = 2050, sp = i)
+  ress_2100 = data.frame(coordinates(resu.b[[i]][[2]]), value = values(resu.b[[i]][[2]]), Year = 2100, sp = i)
+  mean[[i]] = rbind(ress_2100 ,ress_2050 ,ress_2010)
+}
+
+mean = do.call(rbind,mean)
+
+mean = mean %>% group_by(x,y,Year) %>% mutate(value = mean(value))
+
+range(log(mean$value),na.rm = T)
+mean = na.omit(mean)
+mean$value[log(mean$value) < -11] = NA
+arbor0 = plot_rich_diff(mean[mean$Year == 2010,]) + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-11,5))+xlab("")
+arbor1 = plot_rich_diff(mean[mean$Year == 2010,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-11,5))+theme(legend.position = "none")+xlab("")
+arbor2 = plot_rich_diff(mean[mean$Year == 2050,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-11,5))+theme(legend.position = "none")+xlab("")+ ylab("")
+arbor3 = plot_rich_diff(mean[mean$Year == 2100,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limits = c(-11,5))+theme(legend.position = "none")+xlab("")+ ylab("")
+
+legend.bor = get_only_legend(arbor0)
+bor = gridExtra::grid.arrange(arbor1,arbor2,arbor3, ncol = 3)
+arbor = gridExtra::grid.arrange(bor, legend.bor, ncol = 2, widths = c(8,1), 
+                                 top = grid::textGrob("(B)", x = 0, hjust = 0))
+
+#arbor = ggpubr::ggarrange(arbor1,arbor2,arbor3,ncol = 3,common.legend = TRUE,legend="right")
+
+## Boreal
+
+bor = traits %>% filter(Zoo_final == "boreal") %>% select(Species)
+bor = gsub(" ", ".", bor$Species)
+row = which(colnames(PA.hab.sel[[1]][[1]]) %in% bor)  
+## Clim corresponds to which element of the list 1:9 = 2030,2040,2050...2100,2010 i want to select.
+## 2050 is the 3rd, 2100 is thr 8th and 2010 is the 9th
+clim = c(3,8,9)
+resu = list()
+resu.b=list()
+
+for (i in 1:length(row)) {
+  e = row[i]
+  res = raster::stack()
+  res.b = raster::stack()
+  for (l in 1:3){
+    k = clim[l]
+    MpredY   <- PA.hab.sel[[k]][[3]][,e]
+    MpredY.b <- cpue.hab.sel[[k]][[3]][,e]
+    MpredY.b = MpredY.b * MpredY
+    MpredR   <- all.layers[[1]][[1]][[1]]
+    MpredR.b <- all.layers[[1]][[1]][[1]]
+    values(MpredR)[which(!is.na(values(MpredR)))] <- MpredY
+    values(MpredR.b)[which(!is.na(values(MpredR.b)))] <- MpredY.b
+    names(MpredR) = paste(colnames( PA.hab.sel[[k]][[3]])[e], names(PA.hab.sel[[k]][[3]])[k])
+    names(MpredR.b) = paste(colnames(cpue.hab.sel[[k]][[3]])[e], names(cpue.hab.sel[[k]][[3]])[k],"abu")
+    res = raster::stack(res,MpredR)
+    res.b = raster::stack(res.b,MpredR.b)
+  }
+  resu[[i]] = res
+  resu.b[[i]] = res.b
+  #saveRDS(res, file = paste(names(MpredR), ".rds", sep = ""))
+  #saveRDS(res.b, file = paste(names(MpredR.b), ".rds", sep = ""))
+}
+mean = list()
+for (i in 1:length(resu)){
+  ress_2010 = data.frame(coordinates(resu.b[[i]][[3]]), value = values(resu.b[[i]][[3]]), Year = 2010, sp = i)
+  ress_2050 = data.frame(coordinates(resu.b[[i]][[1]]), value = values(resu.b[[i]][[1]]), Year = 2050, sp = i)
+  ress_2100 = data.frame(coordinates(resu.b[[i]][[2]]), value = values(resu.b[[i]][[2]]), Year = 2100, sp = i)
+  mean[[i]] = rbind(ress_2100 ,ress_2050 ,ress_2010)
+}
+
+mean = do.call(rbind,mean)
+
+mean = mean %>% group_by(x,y,Year) %>% mutate(value = mean(value))
+range(log(mean$value),na.rm = T)
+mean = na.omit(mean)
+mean$value[log(mean$value) < -11] = NA
+bor0 = plot_rich_diff(mean[mean$Year == 2010,]) + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-2,6))+xlab("")
+bor1 = plot_rich_diff(mean[mean$Year == 2010,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-2,6))+theme(legend.position = "none")+xlab("")
+bor2 = plot_rich_diff(mean[mean$Year == 2050,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-2,6))+theme(legend.position = "none")+xlab("")+ ylab("")
+bor3 = plot_rich_diff(mean[mean$Year == 2100,])+ margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-2,6))+theme(legend.position = "none")+xlab("")+ ylab("")
+
+legend.bore = get_only_legend(bor0)
+bore = gridExtra::grid.arrange(bor1,bor2,bor3, ncol = 3)
+boreal = gridExtra::grid.arrange(bore, legend.bore, ncol = 2, widths = c(8,1), 
+                                top = grid::textGrob("(C)", x = 0, hjust = 0))
+
+## Subtropical
+
+subt = traits %>% filter(Zoo_final %in% c("subtropical","temperate")) %>% select(Species)
+subt = gsub(" ", ".", subt$Species)
+row = which(colnames(PA.hab.sel[[1]][[1]]) %in% subt)  
+## Clim corresponds to which element of the list 1:9 = 2030,2040,2050...2100,2010 i want to select.
+## 2050 is the 3rd, 2100 is thr 8th and 2010 is the 9th
+clim = c(3,8,9)
+resu = list()
+resu.b=list()
+
+for (i in 1:length(row)) {
+  e = row[i]
+  res = raster::stack()
+  res.b = raster::stack()
+  for (l in 1:3){
+    k = clim[l]
+    MpredY   <- PA.hab.sel[[k]][[3]][,e]
+    MpredY.b <- cpue.hab.sel[[k]][[3]][,e]
+    MpredY.b = MpredY.b * MpredY
+    MpredR   <- all.layers[[1]][[1]][[1]]
+    MpredR.b <- all.layers[[1]][[1]][[1]]
+    values(MpredR)[which(!is.na(values(MpredR)))] <- MpredY
+    values(MpredR.b)[which(!is.na(values(MpredR.b)))] <- MpredY.b
+    names(MpredR) = paste(colnames( PA.hab.sel[[k]][[3]])[e], names(PA.hab.sel[[k]][[3]])[k])
+    names(MpredR.b) = paste(colnames(cpue.hab.sel[[k]][[3]])[e], names(cpue.hab.sel[[k]][[3]])[k],"abu")
+    res = raster::stack(res,MpredR)
+    res.b = raster::stack(res.b,MpredR.b)
+  }
+  resu[[i]] = res
+  resu.b[[i]] = res.b
+  #saveRDS(res, file = paste(names(MpredR), ".rds", sep = ""))
+  #saveRDS(res.b, file = paste(names(MpredR.b), ".rds", sep = ""))
+}
+mean = list()
+for (i in 1:length(resu)){
+  ress_2010 = data.frame(coordinates(resu.b[[i]][[3]]), value = values(resu.b[[i]][[3]]), Year = 2010, sp = i)
+  ress_2050 = data.frame(coordinates(resu.b[[i]][[1]]), value = values(resu.b[[i]][[1]]), Year = 2050, sp = i)
+  ress_2100 = data.frame(coordinates(resu.b[[i]][[2]]), value = values(resu.b[[i]][[2]]), Year = 2100, sp = i)
+  mean[[i]] = rbind(ress_2100 ,ress_2050 ,ress_2010)
+}
+
+mean = do.call(rbind,mean)
+
+mean = mean %>% group_by(x,y,Year) %>% mutate(value = mean(value))
+range(log(mean$value),na.rm = T)
+mean = na.omit(mean)
+mean$value[log(mean$value) < -11] = NA
+subt0 = plot_rich_diff(mean[mean$Year == 2010,])+margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-11,3))
+subt1 = plot_rich_diff(mean[mean$Year == 2010,])+margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-11,3))+theme(legend.position = "none")
+subt2 = plot_rich_diff(mean[mean$Year == 2050,])+margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-11,3))+theme(legend.position = "none") + ylab("")
+subt3 = plot_rich_diff(mean[mean$Year == 2100,])+margin + scale_fill_viridis(name = "Log(CPUE)", na.value = "darkgrey",limit = c(-11,3))+theme(legend.position = "none") + ylab("")
+ 
+legend.subt = get_only_legend(subt0)
+subt = gridExtra::grid.arrange(subt1,subt2,subt3, ncol = 3)
+subtropical = gridExtra::grid.arrange(subt, legend.subt, ncol = 2, widths = c(8,1), 
+                                      top = grid::textGrob("(C)", x = 0, hjust = 0))
+
+## need to save it as image because its too big to open in inkscape
+png("species_comp.png")
+gridExtra::grid.arrange(arctic, arbor,boreal,subtropical, nrow = 4)
+dev.off()
+
+pdf("Example species_cpue.pdf", height=14, width = 10)
+ggpubr::ggarrange(arctic, arbor,boreal,subtropical, nrow = 4)
+dev.off()
