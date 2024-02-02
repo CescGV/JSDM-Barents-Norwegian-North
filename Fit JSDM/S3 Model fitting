@@ -1,0 +1,50 @@
+## The built in option of parallelisation did not work for me, because it took all the server available CPUs
+## without really going faster. I solved it by manually parallelising the process. 
+library(Hmsc)
+library(doParallel)
+library(foreach)
+
+load(file = "models/unfitted_hmsc_model.Rdata") #models, modelnames
+set.seed(1)
+nChains <- 4
+n <- length(models)
+cl.c <- makeCluster(nChains)
+registerDoParallel(cl.c)
+
+time1 = Sys.time()
+
+models.fitted.cv =
+    foreach(chain.num = c(1:nChains)) %dopar% {
+        library(Hmsc)
+        library(doParallel)
+        library(foreach)
+        cl.t<- makeCluster(n)
+        registerDoParallel(cl.t)
+        ## Characteristics of the mcmc
+       mod =
+           foreach(k = c(1:2)) %dopar% {
+               library(Hmsc)
+               library(doParallel)
+               library(foreach)
+               options(mc.cores = 1)
+               RhpcBLASctl::blas_set_num_threads(1)
+               thin <- 500
+               samples <- 250
+               m <- models[[k]]
+               m <- sampleMcmc(
+                   m,
+                   samples = samples,
+                   thin = thin,
+                   adaptNf=rep(ceiling(
+                       0.4*samples*thin),m$nr),
+                   transient = ceiling(
+                       0.5*samples*thin),
+                   nChains = 1, nParallel = 0)
+           }
+        stopCluster(cl.t)
+        return(mod)
+    }
+stopCluster(cl.c)
+save(models.fitted.cv,file = "fitted_hmsc_model.RData")
+time2 = Sys.time()
+time1-time2 # This will tell me how long did the model run for
