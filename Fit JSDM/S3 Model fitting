@@ -4,7 +4,7 @@ library(Hmsc)
 library(doParallel)
 library(foreach)
 
-load(file = "models/unfitted_hmsc_model.Rdata") #models, modelnames
+load(file = "models/unfitted_hmsc_models.Rdata") #models, modelnames
 set.seed(1)
 nChains <- 4
 n <- length(models)
@@ -45,6 +45,6 @@ models.fitted.cv =
         return(mod)
     }
 stopCluster(cl.c)
-save(models.fitted.cv,file = "fitted_hmsc_model.RData")
+save(models.fitted.cv,file = "fitted_hmsc_models.RData")
 time2 = Sys.time()
 time1-time2 # This will tell me how long did the model run for
