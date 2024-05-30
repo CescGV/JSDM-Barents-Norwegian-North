@@ -1,0 +1,123 @@
+# Barents Sea Data
+
+
+## This code is built from the FISHGLOB cleaning code for the Norwegian Sea
+## https://github.com/AquaAuma/FishGlob_data/blob/main/cleaning_codes/get_norway.R#L235
+
+## The original data comes from the norwegian marine data center and is openly available
+## annually under the name "Barents Sea ecosystem survey fish diversity data export"
+## IMR ecosystem survey data obtained in NMDC nmdc.no
+## The files are called "Barents Sea ecosystem survey fish diversity data export XX"
+## The ecosystem survey is done by IMR, the version of the datasets can be changed if 
+## IMR find error in the code. Visit NMDC to get the latest version and credit IMR.
+## Each year have a different file. In the downloaded dataset we use the file under 
+## output/report/ReportSpeciesCategoryCatch_Count and output/report/ReportSpeciesCategoryCatch_weight
+## I gathered each year ReportSpeciesCategoryCatch_weight and placed them in the path_wg folder. 
+
+library(tidyverse)
+
+# path
+path_wg <- 'C:/Users/06061016/OneDrive - Nord universitet/IMR new_data/Weight/'
+files_wg = list.files(path_wg, pattern="*.txt")
+
+wg<-data.frame()
+
+for (i in files_wg){
+  paste(i)
+  wg.yr<-read.delim(paste0(path_wg,i))
+  wg.yr<-wg.yr %>% pivot_longer(cols = -c(Haul:samplequality), names_to="species", values_to = "Weight")
+  wg.yr<-wg.yr %>% filter(!Weight==0)
+  wg<-rbind(wg, wg.yr)                     
+}
+wg
+unique(wg$DateTime)
+norw_dat <- wg
+colnames(norw_dat)
+## Get the year
+norw_dat$year<-format(as.Date(norw_dat$DateTime, format="%Y-%m-%d"),"%Y")
+## Get the month
+norw_dat$month<-format(as.Date(norw_dat$DateTime, format="%Y-%m-%d"),"%m")
+## Get the day
+norw_dat$day<-format(as.Date(norw_dat$DateTime, format="%Y-%m-%d"),"%d")
+
+## Select only best quality
+norw_dat <- norw_dat %>% filter(samplequality==1)
+unique(norw_dat$year)
+
+## I eliminate rows with uncertain depth
+norw_dat = norw_dat[!is.na(norw_dat$BottomDepth),]
+
+## Some raws have NAs in DateTime, I eliminate them
+sum(is.na(wg$DateTime))
+norw_dat[is.na(norw_dat$year),]
+norw_dat = norw_dat[!is.na(norw_dat$year),]
+
+## Add approximate Haul Duration (IMR removed in the last version the real Time)
+## I assume, same as FishGlob, that the haul duration from EffectiveTowDistance (in nm) 
+## is collected at an average speed of 3nm/h (=3 knots)
+
+norw_dat$HaulDur <- (norw_dat$EffectiveTowDistance/3) # Time in hours
+range(norw_dat$HaulDur) # The range seems appropriate for hours
+
+##########################################################################################
+#### REMOVE BAD QUALITY HAULS
+##########################################################################################
+
+# Remove bad quality hauls and gears
+norw_dat <- norw_dat[norw_dat$gearcondition == 1,]
+# Is there still empty species names and abundances?
+sum(is.na(norw_dat$Weight)) # All observations have Weights
+
+# Transform distance nautical miles to km
+# 1nm <-> 1.852km
+norw_dat$Distance <- norw_dat$EffectiveTowDistance*1.852/1
+sum(is.na(norw_dat$Distance))
+
+## Rename some columns
+norw_dat <- norw_dat %>% 
+  dplyr::rename(haul_id = Haul,
+         haul_dur = HaulDur,
+         station = StationKey,
+         latitude = Latitude,
+         longitude = Longitude,
+         depth = BottomDepth,
+         wgt = Weight,
+         scientific_name = species) %>% 
+  select(-CruiseKey,-HaulKey, -Cruise, -Platform, -Station, -CatchPlatform, -stationtype,
+         -samplequality)
+  
+## Clean species names
+norw_dat$scientific_name
+
+norw_dat = norw_dat %>% 
+  mutate(scientific_name = gsub("\\.", " ", scientific_name)) %>%
+  filter(scientific_name!="")
+
+# Numbers as scientific names are for invertebrates in this dataset
+norw_dat = norw_dat[!grepl("[0-9]", norw_dat$scientific_name),]
+
+norw_names <- norw_dat %>% 
+  dplyr::group_by(scientific_name) %>% 
+  dplyr::summarize(n=n()) %>% 
+  pull(scientific_name)
+
+# Cleaning with Fishbase if needed.
+sp_c = unique(norw_dat$scientific_name)[grep(" ", unique(norw_dat$scientific_name))]
+sp_c = sp_c[!grep(" spp", sp_c)]
+sp_check = rfishbase::validate_names(sp_c) 
+sum(sp_c != sp_check) # 0 names are wrong
+
+# Here I calculate CPUE (same as fishbase, same units)
+norw_dat$wgt_cpue = norw_dat$wgt/norw_dat$haul_dur
+norw_dat = norw_dat %>% filter(grepl(" ", scientific_name) & (!grepl("spp", scientific_name)))
+norw_dat = norw_dat %>% filter(Gear %in%  c("3270","3271"))
+
+
+norw_data = norw_dat %>% # filter(site %in% barents$site) %>% 
+  dplyr::rename(accepted_name = scientific_name)
+colSums(is.na(norw_data))
+
+write.csv(norw_data, "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM/data/BARENTS_clean_from_new_raw.csv")
+
+
+
