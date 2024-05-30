@@ -1,0 +1,266 @@
+Species,Zoo_FishBase,Zoo_Atlas,Zoo_final,MaxLengthTL,Troph,TempPrefMean,TempPrefMax,TempPrefMin,DepthMin,DepthMax,Fecmin,Fecmax,FeedingType,AgeMatMin,Lm,DemersPelag,Depth_range,TempRange,Fecundity,Fisheries
+Acipenser sturio,temperate,,temperate,600,3.51,11,18.8,7.3,4,93,433333.33,2300000,hunting macrofauna (predator),9.15,150,demersal,89,11.5,1583333.333,NO
+Agonus cataphractus,temperate,boreal,boreal,21,3.43,9.2,11.7,7,0,270,2450,2700,hunting macrofauna (predator),2,NA,demersal,270,4.7,3800,NO
+Alburnus alburnus,temperate,,temperate,25,2.7,NA,NA,NA,1,NA,3316,10347.5,variable,1.8,9.9,pelagic,NA,NA,8489.75,NO
+Alosa agone,temperate,boreal,boreal,42.6,3.79,NA,NA,NA,NA,NA,NA,NA,NA,2.5,NA,pelagic,NA,NA,NA,NO
+Alosa alosa,temperate,,temperate,83,2.95,10.1,15.6,7,10,300,150000,475000,hunting macrofauna (predator),3,42.55,pelagic,290,8.6,387500,NO
+Alosa fallax,temperate,,temperate,73.2,4.03,10.8,19.3,8.7,10,400,75000,200000,hunting macrofauna (predator),3,28.88,pelagic,390,10.6,175000,NO
+Amblyraja hyperborea,deep-water,arctic,arctic,112,4.31,3.3,8.8,0.3,92,2925,NA,NA,hunting macrofauna (predator),NA,NA,demersal,2833,8.5,NA,NO
+Amblyraja radiata,boreal,arctic-boreal,arctic-boreal,105,4.2,1,5,-0.8,5,1540,28.67,20,hunting macrofauna (predator),NA,63.42,demersal,1535,5.8,38.66666667,NO
+Ammodytes marinus,temperate,boreal,boreal,25,3.27,9.7,11,6.7,10,150,4176.5,13371.83,selective plankton feeding,1.83,14.3,pelagic,140,4.3,10862.41667,HIGHLY COMMERCIAL
+Ammodytes tobianus,temperate,boreal,boreal,24.4,3.08,10.2,13.5,7.3,1,96,NA,NA,filtering plankton,2,13,demersal,95,6.2,NA,HIGHLY COMMERCIAL
+Anarhichas denticulatus,polar,arctic-boreal,arctic-boreal,180,4.04,3.4,7.2,0.6,60,1700,NA,NA,variable,NA,NA,pelagic,1640,6.6,NA,NO
+Anarhichas lupus,temperate,boreal,boreal,150,3.86,7.8,12.1,0.8,1,600,18870,NA,hunting macrofauna (predator),6,55,demersal,599,11.3,18870,NO
+Anarhichas minor,temperate,boreal,boreal,180,3.84,3.5,7.6,0.6,25,600,4200,35200,hunting macrofauna (predator),NA,55,demersal,575,7,21800,NO
+Anguilla anguilla,temperate,boreal,boreal,133,3.55,7.9,14.5,3,0,700,2000000,3000000,hunting macrofauna (predator),8.83,50.83,demersal,700,11.5,3500000,COMMERCIAL
+Anisarchus medius,polar,arctic-boreal,arctic-boreal,30,3.22,-0.6,4.1,-1.6,10,300,NA,NA,hunting macrofauna (predator),NA,NA,demersal,290,5.7,NA,NO
+Aphia minuta,subtropical,,subtropical,7.9,3.1,10.8,18.6,7.6,0,97,935,2648,filtering plankton,0.42,3.6,pelagic,97,11,2259,NO
+Arctogadus glacialis,deep-water,arctic,arctic,32.5,3.21,-0.1,1.6,-1.3,0,1000,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,1000,2.9,NA,NO
+Arctozenus risso,deep-water,deep-water,deep-water,36.6,3.94,4.1,10.8,0.8,0,2200,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,2200,10,NA,NO
+Argentina silus,deep-polar,boreal,boreal,85.4,3.32,5.5,10.2,1.4,140,1440,NA,4478,selective plankton feeding,6.33,33,pelagic,1300,8.8,4478,COMMERCIAL
+Argentina sphyraena,deep-water,deep-water,deep-water,42.7,3.49,8,13.3,6.4,50,700,NA,NA,hunting macrofauna (predator),NA,NA,demersal,650,6.9,NA,NO
+Argyropelecus hemigymnus,deep-water,deep-water,deep-water,5.1,3.06,11.3,21.3,5.5,0,2400,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,2400,15.8,NA,NO
+Arnoglossus imperialis,subtropical,,subtropical,25,3.84,11.7,19.2,9.8,20,350,NA,NA,hunting macrofauna (predator),NA,NA,demersal,330,9.4,NA,COMMERCIAL
+Arnoglossus laterna,subtropical,subtropical,subtropical,30.5,3.59,10.8,19.5,7.4,10,200,NA,NA,hunting macrofauna (predator),3,10.03,demersal,190,12.1,NA,NO
+Artediellus atlanticus,temperate,arctic-boreal,arctic-boreal,18.3,3.57,3,7.4,0.4,35,900,60,145.33,hunting macrofauna (predator),NA,NA,demersal,865,7,132.6666667,NO
+Aspidophoroides olrikii,polar,arctic,arctic,8.6,3.32,-0.6,1.8,-1.6,0,632,260,NA,hunting macrofauna (predator),NA,NA,demersal,632,3.4,260,NO
+Atherina presbyter,subtropical,,subtropical,20,3.67,11.5,20.3,9.2,0,50,NA,NA,selective plankton feeding,NA,NA,pelagic,50,11.1,NA,NO
+Bathyraja brachyurops,temperate,,temperate,103,4.07,6,8,4.7,81,313,NA,NA,hunting macrofauna (predator),NA,NA,demersal,232,3.3,NA,NO
+Bathyraja spinicauda,boreal,arctic-boreal,arctic-boreal,170,4.41,2.5,7.6,0.3,140,1463,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,1323,7.3,NA,NO
+Belone belone,temperate,boreal,boreal,104,4.16,11.3,20,8.8,0,50,4207.6,34295.6,hunting macrofauna (predator),2,NA,pelagic,50,11.2,21355.4,COMMERCIAL
+Benthosema glaciale,deep-water,arctic-boreal,arctic-boreal,12.57,3.14,5.1,12.8,1.6,0,1407,151,1519,selective plankton feeding,1.67,36,pelagic,1407,11.2,910.5,NO
+Blennius ocellaris,subtropical,,subtropical,20,3.49,13.9,17.1,11,10,400,NA,NA,hunting macrofauna (predator),NA,9.64,demersal,390,6.1,NA,NO
+Boreogadus saida,polar,arctic,arctic,40,3.12,0.2,4,-1.3,0,1383,16700,43066.67,hunting macrofauna (predator),2.67,NA,demersal,1383,5.3,38233.33333,HIGHLY COMMERCIAL
+Brama brama,subtropical,,subtropical,100,4.08,11.8,23.9,6.7,0,1000,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,1000,17.2,NA,COMMERCIAL
+Brosme brosme,polar-temperate,boreal,boreal,120,3.9,3.6,7.7,0.5,18,1000,2000000,3000000,hunting macrofauna (predator),8,53.25,demersal,982,7.2,3500000,HIGHLY COMMERCIAL
+Buenia jeffreysii,temperate,boreal,boreal,6,3.62,9.2,11.7,7,5,330,NA,NA,hunting macrofauna (predator),NA,NA,demersal,325,4.7,NA,NO
+Buglossidium luteum,subtropical,Subtropical,subtropical,20,3.31,10.6,18.8,8.1,5,450,NA,NA,hunting macrofauna (predator),NA,7.6,demersal,445,10.7,NA,NO
+Callionymus lyra,temperate,boreal,boreal,30.5,3.27,13.3,19.5,11.7,5,430,NA,NA,hunting macrofauna (predator),NA,17.4,demersal,425,7.8,NA,NO
+Callionymus maculatus,temperate,boreal,boreal,16.5,3.31,8.6,13,6.7,45,650,NA,NA,hunting macrofauna (predator),NA,NA,demersal,605,6.3,NA,NO
+Callionymus reticulatus,temperate,boreal,boreal,18.5,3.28,10.5,12.5,7.7,0,110,NA,NA,hunting macrofauna (predator),NA,NA,demersal,110,4.8,NA,NO
+Capros aper,subtropical,subtropical,subtropical,30,3.14,10.7,15,6.9,40,700,NA,NA,hunting macrofauna (predator),NA,8.15,demersal,660,8.1,NA,NO
+Careproctus derjugini,deep-water,deep-water,deep-water,26.47,3.28,NA,NA,NA,344,363,NA,NA,NA,NA,NA,demersal,19,NA,NA,NO
+Careproctus dubius,temperate,boreal,boreal,20,3.25,NA,NA,NA,NA,150,NA,NA,NA,NA,NA,demersal,NA,NA,NA,NO
+Careproctus longipinnis,deep-water,deep-water,deep-water,20,3.5,3.6,6,-0.2,340,1322,NA,NA,NA,NA,NA,demersal,982,6.2,NA,NO
+Careproctus macrophthalmus,temperate,boreal,boreal,10.9,3.19,NA,NA,NA,260,275,NA,NA,NA,NA,NA,demersal,15,NA,NA,NO
+Careproctus micropus,deep-water,arctic,arctic,10,3.18,3.4,7.6,0.3,100,1800,NA,NA,NA,NA,NA,demersal,1700,7.3,NA,NO
+Careproctus ranula,,boreal,boreal,9.88,3.18,4,7.6,0.5,20,668,10,20,NA,NA,NA,demersal,648,7.1,20,NO
+Careproctus reinhardti,deep-water,arctic,arctic,30,3.75,3,8.6,0.4,75,1750,NA,NA,variable,NA,NA,demersal,1675,8.2,NA,NO
+Careproctus solidus,temperate,boreal,boreal,14.34,3.22,NA,NA,NA,1151,2151,NA,NA,NA,NA,NA,demersal,1000,NA,NA,NO
+Careproctus tapirus,deep-water,deep-water,deep-water,16.96,3.23,NA,NA,NA,170,320,NA,NA,NA,NA,NA,demersal,150,NA,NA,NO
+Careproctus telescopus,deep-water,deep-water,deep-water,14,3.21,NA,NA,NA,260,307,NA,NA,NA,NA,NA,demersal,47,NA,NA,NO
+Centrolabrus exoletus,temperate,,temperate,18,3.5,10.7,13,8.9,1,25,NA,NA,hunting macrofauna (predator),NA,NA,demersal,24,4.1,NA,NO
+Centrophorus squamosus,,deep-water,deep-water,164,4.47,7,10.6,4.1,145,2400,5.17,10,hunting macrofauna (predator),NA,114.12,demersal,2255,6.5,10.16666667,NO
+Cetorhinus maximus,temperate,,temperate,1520,3.2,11.4,22.7,5.4,0,2000,1,2,filtering plankton,11.43,688.57,pelagic,2000,17.3,2,COMMERCIAL
+Chelidonichthys cuculus,temperate,boreal,boreal,70,3.81,10.1,15.8,7,15,400,NA,NA,hunting macrofauna (predator),NA,26.1,demersal,385,8.8,NA,NO
+Chelidonichthys lastoviza,subtropical,,subtropical,40,3.49,11.8,26,8.9,10,150,NA,NA,hunting macrofauna (predator),NA,15,demersal,140,17.1,NA,COMMERCIAL
+Chelidonichthys lucerna,subtropical,subtropical,subtropical,82.8,3.98,9.8,16,7,20,318,NA,NA,hunting macrofauna (predator),NA,25.12,demersal,298,9,NA,COMMERCIAL
+Chelon auratus,temperate,,temperate,67.71,2.84,11.9,20.7,9.7,10,20,100000,1480000,variable,NA,30.5,pelagic,10,11,840000,NO
+Chelon labrosus,subtropical,,subtropical,91.5,2.59,11,20.1,8.8,1,50,NA,NA,browsing on substrate,2.5,27.25,demersal,49,11.3,NA,COMMERCIAL
+Chelon ramada,temperate,,temperate,70,2.34,11.8,20.1,9.7,10,20,215292,670044.75,variable,3,27.89,pelagic,10,10.4,550314.375,COMMERCIAL
+Chimaera monstrosa,deep-water,deep-water,deep-water,150,3.75,7.9,14.1,3.7,40,1400,NA,NA,hunting macrofauna (predator),11.2,43.3,demersal,1360,10.4,NA,NO
+Chirolophis ascanii,temperate,boreal,boreal,30.5,3.23,10.1,12,6.7,10,400,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,390,5.3,NA,NO
+Ciliata mustela,temperate,boreal,boreal,25,3.5,10.3,11.8,8.4,17,22,9000,30000,hunting macrofauna (predator),1,NA,demersal,5,3.4,24000,COMMERCIAL
+Ciliata septentrionalis,temperate,boreal,boreal,20,3.5,10.3,12.3,7.7,10,90,NA,NA,hunting macrofauna (predator),NA,6.69,demersal,80,4.6,NA,COMMERCIAL
+Clupea harengus,polar-temperate,boreal,boreal,54.9,3.38,6.6,11.2,0.5,0,364,16798.41,69306.08,selective plankton feeding,2.56,22.51,pelagic,364,10.7,51451.45076,HIGHLY COMMERCIAL
+Coelorinchus caelorhincus,deep-water,deep-water,deep-water,48,3.49,13.2,19.6,8.6,90,1485,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,1395,11,NA,NO
+Coelorinchus labiatus,,boreal,boreal,50,3.95,6.7,8.5,4.2,460,2220,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1760,4.3,NA,NO
+Conger conger,temperate,boreal,boreal,300,4.31,8.7,14.4,4.4,0,1171,3000000,8000000,hunting macrofauna (predator),5,131.25,demersal,1171,10,7000000,COMMERCIAL
+Coryphaenoides rupestris,deep-temperate,boreal,boreal,110,3.66,4.5,9.4,2.7,180,2600,9736.43,47776.63,hunting macrofauna (predator),9,50.32,pelagic,2420,6.7,33624.74107,COMMERCIAL
+Cottunculus microps,deep-water,arctic-boreal,arctic-boreal,36.6,4.14,2.6,7.7,0.3,165,1342,66,99,variable,NA,NA,demersal,1177,7.4,115.5,NO
+Cottunculus sadko,,arctic-boreal,arctic-boreal,19,3.62,0.8,1.9,-0.8,300,700,NA,NA,NA,NA,NA,demersal,400,2.7,NA,NO
+Crystallogobius linearis,temperate,,temperate,5.73,3.4,9.8,14.3,6.8,1,400,270,700,selective plankton feeding,NA,NA,demersal,399,7.5,620,NO
+Ctenolabrus rupestris,temperate,,temperate,18,3.58,10.4,15,8.7,1,50,NA,NA,hunting macrofauna (predator),NA,NA,demersal,49,6.3,NA,
+Cyclopteropsis mcalpini,polar,arctic,arctic,7.5,3.22,NA,NA,NA,109,329,NA,NA,NA,NA,NA,demersal,220,NA,NA,NO
+Cyclopterus lumpus,polar,boreal,boreal,61,3.67,7.1,11.4,0.6,0,868,115045.67,279220.5,hunting macrofauna (predator),3.25,NA,pelagic,868,10.8,254655.9167,HIGHLY COMMERCIAL
+Dasyatis pastinaca,subtropical,,subtropical,123.5,4.05,12.2,26.1,9.7,5,200,4,7,hunting macrofauna (predator),NA,NA,demersal,195,16.4,7.5,
+Dicentrarchus labrax,subtropical,subtropical,subtropical,103,3.47,10.7,19.5,7.3,10,100,231875,808581,hunting macrofauna (predator),4,32.3,demersal,90,12.2,636165.5,COMMERCIAL
+Diplecogaster bimaculata,temperate,,temperate,7.32,3.39,10.6,13,8.9,NA,NA,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,NA,4.1,NA,
+Dipturus batis,subtropical,boreal,boreal,285,3.52,9.8,15,7.1,100,1000,40,NA,hunting macrofauna (predator),NA,145,demersal,900,7.9,40,NO
+Dipturus intermedius,temperate,,temperate,230,4.06,NA,NA,NA,1,1500,NA,NA,NA,NA,NA,demersal,1499,NA,NA,
+Dipturus nidarosiensis,deep-water,deep-water,deep-water,200,3.5,7.1,10.8,2.1,125,1420,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1295,8.7,NA,NO
+Dipturus oxyrinchus,deep-water,deep-water,deep-water,150,3.5,10.2,14.4,5.4,70,1230,NA,NA,NA,NA,NA,demersal,1160,9,NA,NO
+Echiichthys vipera,subtropical,subtropical,subtropical,18.3,4.41,10.5,16.1,7.3,0,50,NA,NA,hunting macrofauna (predator),NA,NA,demersal,50,8.8,NA,NO
+Echiodon drummondii,deep-water,deep-water,deep-water,30,4.03,8.4,10.2,7.1,52,403,NA,NA,hunting macrofauna (predator),NA,NA,demersal,351,3.1,NA,NO
+Enchelyopus cimbrius,temperate,boreal,boreal,41,3.58,10,13.8,4.1,20,650,5000,45000,hunting macrofauna (predator),3,25,demersal,630,9.7,27500,NO
+Engraulis encrasicolus,temperate-subtrop,,temperate,24.4,3.12,10.8,18,7.1,0,400,22383.47,142134.25,selective plankton feeding,1,10.68,pelagic,400,10.9,93450.59868,HIGHLY COMMERCIAL
+Entelurus aequoreus,temperate,boreal,boreal,60,3.54,10.1,12.5,7.3,5,100,1000,NA,variable,2,NA,demersal,95,5.2,1000,NO
+Epigonus telescopus,<NA>,deep-water,deep-water,75,3.59,8.9,13.8,4.6,75,1200,NA,NA,hunting macrofauna (predator),NA,54.2,demersal,1125,9.2,NA,NO
+Etmopterus spinax,deep-water,deep-water,deep-water,60,4.14,9.2,14.2,5.8,70,2490,6,20,hunting macrofauna (predator),NA,34.5,demersal,2420,8.4,16,NO
+Eumicrotremus derjugini,polar,arctic,arctic,12.2,3.25,0.2,2.9,-1.2,5,1038,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1033,4.1,NA,NO
+Eumicrotremus spinosus,polar,arctic,arctic,8.74,3.24,0.8,7.1,-1,30,400,NA,NA,hunting macrofauna (predator),NA,NA,demersal,370,8.1,NA,NO
+Eutrigla gurnardus,temperate,boreal,boreal,60,3.87,10.1,13.5,7.3,10,340,200000,300000,hunting macrofauna (predator),3.33,21.1,demersal,330,6.2,350000,COMMERCIAL
+Gadiculus argenteus,temperate,boreal,boreal,15.25,3.6,7.9,13.9,3.4,100,1000,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,900,10.5,NA,NO
+Gadus chalcogrammus,polar,boreal,boreal,91,3.57,1.6,5.6,0.4,1,1280,290000,2645683.33,hunting macrofauna (predator),3.67,35.73,pelagic,1279,5.2,1612841.667,HIGHLY COMMERCIAL
+Gadus morhua,polar-temperate,boreal,boreal,200,4.09,6.6,10.3,0.5,0,600,915628.82,7329546.55,hunting macrofauna (predator),3.63,59.06,pelagic,600,9.8,4580402.099,HIGHLY COMMERCIAL
+Gaidropsarus argentatus,boreal,arctic-boreal,arctic-boreal,42.7,3.39,4.1,9.6,-0.6,150,2260,NA,NA,variable,NA,NA,demersal,2110,10.2,NA,COMMERCIAL
+Gaidropsarus macrophthalmus,temperate,boreal,boreal,25,3.5,10,11.7,7.2,150,530,NA,NA,hunting macrofauna (predator),NA,NA,demersal,380,4.5,NA,NO
+Gaidropsarus vulgaris,temperate,boreal,boreal,60,3.47,9.6,12.6,7.1,20,120,NA,NA,hunting macrofauna (predator),NA,NA,demersal,100,5.5,NA,NO
+Galeorhinus galeus,subtropical,subtropical,subtropical,195,4.34,12.3,23.2,6.7,0,1100,10.5,36.5,hunting macrofauna (predator),9.83,139.08,pelagic,1100,16.5,28.75,NO
+Galeus melastomus,deep-water,deep-water,deep-water,90,4.17,10.3,14.4,4.4,55,1873,37.67,74,hunting macrofauna (predator),3,58.59,demersal,1818,10,74.66666667,NO
+Gasterosteus aculeatus,subtropical,subtropical,subtropical,11,3.31,8,13.5,2,0,100,76.67,875,hunting macrofauna (predator),1,4.53,pelagic,100,11.5,514.1666667,NO
+Glyptocephalus cynoglossus,temperate,boreal,boreal,73.2,3.17,7,11.4,0.6,18,1570,48800,508300,hunting macrofauna (predator),4,28.74,demersal,1552,10.8,302950,COMMERCIAL
+Gobius gasteveni,temperate,,temperate,12,3.25,11.4,16,10,35,270,NA,NA,NA,NA,NA,demersal,235,6,NA,
+Gobius niger,temperate,boreal,boreal,18,3.31,10.8,18.8,8.3,1,96,1000,6000,selective plankton feeding,0.8,11.26,demersal,95,10.5,4000,NO
+Gobius paganellus,subtropical,,subtropical,13,3.3,17.7,20.2,9.8,0,15,1054,8978,hunting macrofauna (predator),1,6.5,demersal,15,10.4,5543,
+Gobiusculus flavescens,<NA>,boreal,boreal,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NO
+Gymnammodytes semisquamatus,temperate,boreal,boreal,36.6,2.68,10.4,12.4,7.7,1,100,NA,NA,filtering plankton,NA,NA,demersal,99,4.7,NA,COMMERCIAL
+Gymnelus retrodorsalis,temperate,arctic,arctic,14,3.2,-0.1,3.2,-1.6,8,481,NA,NA,NA,NA,NA,demersal,473,4.8,NA,NO
+Gymnelus viridis,polar,arctic,arctic,56,3.06,-0.5,4.8,-1.5,0,320,NA,NA,hunting macrofauna (predator),NA,NA,demersal,320,6.3,NA,NO
+Gymnocanthus tricuspis,polar,arctic,arctic,30,3.28,-0.6,1.8,-1.6,0,556,3030,5414,hunting macrofauna (predator),2.5,7.75,demersal,556,3.4,5737,NO
+Helicolenus dactylopterus,deep-water,deep-water,deep-water,50,3.94,10.6,18.1,4,50,1100,31767,428343,hunting macrofauna (predator),15,29,demersal,1050,14.1,245938.5,NO
+Hippocampus hippocampus,subtropical,,subtropical,15,3.15,17.8,26.5,10.9,0,60,NA,865,variable,0.33,7.7,demersal,60,15.6,865,
+Hippoglossoides platessoides,temperate,arctic-boreal,arctic-boreal,82.6,3.73,5.6,10.3,0.6,10,3000,25039,1147389,hunting macrofauna (predator),3,28.49,demersal,2990,9.7,598733.5,HIGHLY COMMERCIAL
+Hippoglossus hippoglossus,temperate,boreal,boreal,470,4,3.4,7.9,0.4,50,2000,1300000,3500000,hunting macrofauna (predator),7.2,98.75,demersal,1950,7.5,3050000,COMMERCIAL
+Hyperoplus immaculatus,temperate,boreal,boreal,42.7,4.38,10.8,12.3,9.2,0,50,NA,NA,hunting macrofauna (predator),NA,NA,demersal,50,3.1,NA,NO
+Hyperoplus lanceolatus,temperate,boreal,boreal,48.8,3.98,10.3,12.8,8.8,6,30,35000,NA,variable,2,13,demersal,24,4,35000,HIGHLY COMMERCIAL
+Icelus bicornis,polar,arctic,arctic,19.15,3.13,0.2,4.6,-1.3,0,930,79,180,hunting macrofauna (predator),NA,NA,demersal,930,5.9,169,NO
+Icelus spatula,polar,arctic-boreal,arctic-boreal,21,3.92,-0.5,4.2,-1.5,12,930,110,1000,hunting macrofauna (predator),NA,NA,demersal,918,5.7,610,NO
+Labrus bergylta,temperate,,temperate,65.9,3.97,10.5,13.3,8.7,1,50,500,NA,hunting macrofauna (predator),6,17,demersal,49,4.6,500,
+Labrus merula,subtropical,,subtropical,54.9,3.55,19.2,21.3,17.6,1,20,NA,NA,hunting macrofauna (predator),NA,17.5,demersal,19,3.7,NA,
+Labrus mixtus,subtropical,,subtropical,48.8,3.91,10,17.1,7,2,200,NA,NA,hunting macrofauna (predator),NA,16,demersal,198,10.1,NA,
+Lamna nasus,boreal-temperate,,boreal,350,4.46,7.8,16.3,3.1,0,1360,2,4.5,hunting macrofauna (predator),9.2,169.25,pelagic,1360,13.2,4.25,
+Lampanyctus crocodilus,<NA>,deep-water,deep-water,36.6,3.22,7.9,14.6,3.4,0,1200,NA,NA,selective plankton feeding,NA,NA,pelagic,1200,11.2,NA,NO
+Lampanyctus macdonaldi,deep-water,deep-water,deep-water,19.52,3.1,5.2,8.8,2.1,60,1464,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,1404,6.7,NA,NO
+Lampetra fluviatilis,temperate,,temperate,50,4.5,9.8,12.2,5.2,10,50,6430,36083.33,hunting macrofauna (predator),4.75,30.03,demersal,40,7,24471.66667,
+Lepadogaster lepadogaster,subtropical,,subtropical,7.93,3.14,19,21.2,16.1,0,15,NA,NA,NA,NA,NA,demersal,15,5.1,NA,
+Lepidorhombus boscii,temperate,boreal,boreal,48.8,3.74,11.5,15.1,7.5,7,800,42000,180000,hunting macrofauna (predator),1,17,demersal,793,7.6,132000,NO
+Lepidorhombus whiffiagonis,deep-temperate,,temperate,60,4.34,7.7,11.4,6.3,100,700,26522,640523,hunting macrofauna (predator),1,24.35,demersal,600,5.1,346783.5,HIGHLY COMMERCIAL
+Leptagonus decagonus,polar,arctic-boreal,arctic-boreal,21,3.22,0.7,6.7,-0.9,0,930,1088,1527.5,variable,NA,NA,demersal,930,7.6,1851.75,NO
+Leptoclinus maculatus,polar,arctic-boreal,arctic-boreal,20,3.28,2.3,7,0.2,2,607,931,2793,hunting macrofauna (predator),NA,12.5,demersal,605,6.8,2327.5,NO
+Lesueurigobius friesii,subtropical,,subtropical,13,3.36,10.4,18.4,7.2,10,130,NA,NA,NA,NA,4.5,demersal,120,11.2,NA,
+Lesueurigobius suerii,<NA>,subtropical,subtropical,7.5,3.55,14.7,18,13.3,1,337,NA,NA,NA,NA,NA,demersal,336,4.7,NA,NO
+Leucoraja circularis,temperate,boreal,boreal,120,3.5,11.3,14.2,7.5,10,800,NA,NA,hunting macrofauna (predator),NA,NA,demersal,790,6.7,NA,NO
+Leucoraja fullonica,deep-water,deep-water,deep-water,120,3.5,9.5,14.5,6.8,30,600,NA,NA,hunting macrofauna (predator),NA,NA,demersal,570,7.7,NA,NO
+Leucoraja naevus,subtropical,subtropical,subtropical,81,4.21,10.5,16.7,7.2,12,900,59.25,63,hunting macrofauna (predator),NA,56.9,demersal,888,9.5,90.75,COMMERCIAL
+Limanda limanda,temperate,boreal,boreal,48.8,3,8.9,11.8,6.9,20,150,64687.5,413416.67,hunting macrofauna (predator),2.27,18.77,demersal,130,4.9,271395.8333,COMMERCIAL
+Liparis bathyarcticus,temperate,arctic,arctic,14,3.44,1.1,1.9,-0.7,400,647,NA,NA,NA,NA,NA,demersal,247,2.6,NA,NO
+Liparis fabricii,deep-water,arctic,arctic,21,3.33,0.7,4.6,-0.9,6,1880,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1874,5.5,NA,NO
+Liparis liparis,temperate,boreal,boreal,15,3.59,8,11.4,4.9,1,300,NA,NA,hunting macrofauna (predator),NA,NA,demersal,299,6.5,NA,NO
+Liparis montagui,temperate,boreal,boreal,15.5,3.45,10.1,12.3,7.8,0,30,793,NA,hunting macrofauna (predator),NA,NA,demersal,30,4.5,793,NO
+Liparis tunicatus,polar,arctic,arctic,16,3.5,-1.2,0.8,-1.8,0,620,NA,NA,hunting macrofauna (predator),NA,NA,demersal,620,2.6,NA,NO
+Lophius budegassa,deep-water,,deep-water,122,4.41,11.1,13.5,9,70,1013,87569,222653,hunting macrofauna (predator),7,NA,demersal,943,4.5,198895.5,
+Lophius piscatorius,deep-water,boreal,boreal,244,4.45,7.7,14.2,3.8,20,1000,1000000,NA,hunting macrofauna (predator),10,55.5,demersal,980,10.4,1000000,HIGHLY COMMERCIAL
+Lumpenus fabricii,polar,arctic-boreal,arctic-boreal,50.5,3.28,-0.3,3.8,-1.6,0,235,NA,NA,hunting macrofauna (predator),NA,NA,demersal,235,5.4,NA,NO
+Lumpenus lampretaeformis,temperate,boreal,boreal,50,3.59,3.1,8.5,0.4,30,373,NA,NA,hunting macrofauna (predator),NA,20,demersal,343,8.1,NA,NO
+Lycenchelys kolthoffi,deep-water,arctic,arctic,28.3,3.1,1.8,4.6,-0.1,202,930,NA,NA,NA,NA,16,demersal,728,4.7,NA,NO
+Lycenchelys muraena,deep-water,arctic,arctic,27.57,3.5,3.4,6.6,-0.6,350,1700,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1350,7.2,NA,NO
+Lycenchelys sarsii,deep-water,boreal,boreal,20,3.21,6.4,10.1,2.6,150,600,NA,NA,hunting macrofauna (predator),NA,NA,demersal,450,7.5,NA,NO
+Lycodes adolfi,<NA>,arctic,arctic,29.28,3.25,3.5,3.9,-0.9,274,2150,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1876,4.8,NA,NO
+Lycodes esmarkii,deep-water,boreal,boreal,75,3.91,3.2,5.4,1.1,143,1090,NA,NA,hunting macrofauna (predator),NA,NA,demersal,947,4.3,NA,NO
+Lycodes eudipleurostictus,polar,arctic,arctic,54.29,3.5,0.8,4,-0.9,25,1187,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1162,4.9,NA,NO
+Lycodes frigidus,deep-water,arctic,arctic,69,4.47,-0.7,3.6,-0.9,475,3000,NA,NA,hunting macrofauna (predator),NA,NA,demersal,2525,4.5,NA,NO
+Lycodes gracilis,polar,boreal,boreal,28,3.55,5.4,9.7,0.7,94,113,NA,NA,NA,NA,NA,demersal,19,9,NA,NO
+Lycodes luetkenii,<NA>,arctic,arctic,43.31,3.95,-0.5,5.9,-0.8,112,1463,NA,NA,NA,NA,NA,demersal,1351,6.7,NA,NO
+Lycodes paamiuti,deep-water,arctic,arctic,29.28,3.39,1.5,4.6,-0.4,122,1450,NA,NA,NA,NA,NA,demersal,1328,5,NA,NO
+Lycodes pallidus,polar,arctic,arctic,26,3.14,0.8,4.9,-0.9,6,1750,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1744,5.8,NA,NO
+Lycodes polaris,polar,arctic,arctic,25,3.36,-0.9,1.6,-1.6,0,300,NA,NA,hunting macrofauna (predator),NA,NA,demersal,300,3.2,NA,NO
+Lycodes reticulatus,deep-water,arctic,arctic,36,3.49,3.5,7.1,1.4,18,930,NA,NA,hunting macrofauna (predator),NA,NA,demersal,912,5.7,NA,NO
+Lycodes rossi,polar,arctic,arctic,31,3.54,-0.5,2.6,-1.6,42,365,NA,NA,variable,NA,NA,demersal,323,4.2,NA,NO
+Lycodes seminudus,deep-water,arctic,arctic,51.7,3.4,0.4,2.6,-0.7,50,1400,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1350,3.3,NA,NO
+Lycodes squamiventer,deep-water,arctic,arctic,26,3.37,0.9,4.3,-0.6,198,1808,NA,NA,NA,NA,NA,demersal,1610,4.9,NA,NO
+Lycodes vahlii,deep-water,,deep-water,52,3.4,3.2,5.6,1.4,39,1200,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1161,4.2,NA,NO
+Lycodonus flagellicauda,deep-water,arctic,arctic,24.28,3.5,-0.6,5.3,-0.9,800,1993,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1193,6.2,NA,NO
+Macroramphosus scolopax,subtropical,subtropical,subtropical,20,3.47,13.6,22.7,6.5,25,600,NA,NA,hunting macrofauna (predator),NA,NA,demersal,575,16.2,NA,COMMERCIAL
+Macrourus berglax,temperate,boreal,boreal,110,3.81,3.2,7,0.8,100,1000,15977,65688.33,hunting macrofauna (predator),14.8,54.13,pelagic,900,6.2,48821.16667,COMMERCIAL
+Malacocephalus laevis,deep-water,deep-water,deep-water,60,3.79,9.5,13.9,6.1,200,1000,NA,NA,hunting macrofauna (predator),NA,NA,demersal,800,7.8,NA,NO
+Mallotus villosus,polar,arctic-boreal,arctic-boreal,25.2,3.15,2.7,7.1,0.3,0,725,6574.88,25250.54,selective plankton feeding,2,13.75,pelagic,725,6.8,19200.14423,HIGHLY COMMERCIAL
+Maurolicus muelleri,deep-water,boreal,boreal,8,3.01,7.1,13.3,3.2,271,1524,166,910,selective plankton feeding,NA,NA,pelagic,1253,10.1,621,NO
+Melanogrammus aeglefinus,polar-temperate,boreal,boreal,112,4.03,8.4,12.1,1.4,10,450,101181.82,1282988.89,hunting macrofauna (predator),2.95,36.48,demersal,440,10.7,742676.2626,HIGHLY COMMERCIAL
+Merlangius merlangus,temperate,boreal,boreal,91.5,4.36,9.2,11.9,7,10,200,211171.6,358035.33,hunting macrofauna (predator),1.6,26.15,pelagic,190,4.9,390189.2667,HIGHLY COMMERCIAL
+Merluccius merluccius,temperate,boreal,boreal,140,4.47,10.2,15.4,6.9,30,1075,553354.24,2277902.05,hunting macrofauna (predator),4.29,36.97,demersal,1045,8.5,1692305.262,HIGHLY COMMERCIAL
+Micrenophrys lilljeborgii,temperate,boreal,boreal,9.03,3.79,10.2,12,7.7,0,100,NA,NA,hunting macrofauna (predator),NA,NA,demersal,100,4.3,NA,NO
+Microchirus variegatus,subtropical,subtropical,subtropical,42.7,3.28,10.3,16,7,20,400,NA,NA,hunting macrofauna (predator),3,NA,demersal,380,9,NA,COMMERCIAL
+Micromesistius poutassou,temperate,boreal,boreal,55.5,4.13,7,13.9,3.1,150,3000,35000,118600,hunting macrofauna (predator),3.33,20.72,pelagic,2850,10.8,94300,HIGHLY COMMERCIAL
+Microstomus kitt,temperate,boreal,boreal,65,3.21,9.9,12.5,7.1,10,200,84954,355148,sucking food-containing material,3,29.33,demersal,190,5.4,262528,COMMERCIAL
+Molva dypterygia,polar-temperate,boreal,boreal,155,4.49,6.3,14.1,2.1,150,1000,NA,NA,hunting macrofauna (predator),8.8,79,demersal,850,12,NA,COMMERCIAL
+Molva molva,polar-temperate,boreal,boreal,200,4.4,7.7,11.3,4.6,100,1000,40000000,60000000,hunting macrofauna (predator),5,84.75,demersal,900,6.7,70000000,HIGHLY COMMERCIAL
+Mugil cephalus,subtropical,,subtropical,122,2.48,23.2,27.9,11.3,0,120,1861153.4,4099702.4,variable,3.56,32.81,pelagic,120,16.6,3911004.6,
+Mullus barbatus,subtropical,,subtropical,38.2,3.14,14.2,15.9,13.1,10,328,9361.67,77500,hunting macrofauna (predator),NA,11.17,demersal,318,2.8,48111.66667,
+Mullus surmuletus,subtropical,subtropical,subtropical,48.8,3.45,10.2,16.1,7,5,409,NA,NA,hunting macrofauna (predator),1.33,15.72,demersal,404,9.1,NA,COMMERCIAL
+Mustelus asterias,temperate,boreal,boreal,140,3.62,10.1,16.2,7,0,350,5.5,17.5,hunting macrofauna (predator),2.15,78.45,demersal,350,9.2,14.25,NO
+Mustelus mustelus,temperate,,temperate,200,4.26,15.3,27.3,9.8,5,624,4,15,hunting macrofauna (predator),9,72,demersal,619,17.5,11.5,
+Myoxocephalus quadricornis,polar,arctic,arctic,60,3.85,-1,4.3,-1.8,0,100,1430.67,10666.67,variable,5.67,15.5,demersal,100,6.1,6764,NO
+Myoxocephalus scorpius,polar,arctic-boreal,arctic-boreal,60,3.69,4.5,10.3,0.4,0,451,3968.4,20000,hunting macrofauna (predator),2,18.1,demersal,451,9.9,13968.4,NO
+Myxine glutinosa,boreal,boreal,boreal,95,3.44,5.3,10.2,1,20,1200,20,30,hunting macrofauna (predator),NA,NA,pelagic,1180,9.2,35,NO
+Nansenia groenlandica,deep-water,deep-water,deep-water,29.89,3.35,7.3,10.7,2.1,0,1400,NA,NA,NA,NA,NA,pelagic,1400,8.6,NA,NO
+Nerophis lumbriciformis,temperate,,temperate,17,4.03,11,16,9.4,0,30,NA,NA,NA,2,NA,demersal,30,6.6,NA,
+Nerophis ophidion,temperate,boreal,boreal,30,3.54,13.5,19.3,8.6,2,15,NA,NA,hunting macrofauna (predator),NA,NA,demersal,13,10.7,NA,NO
+Notoscopelus kroyeri,temperate,boreal,boreal,17.45,3.17,6.8,10.2,3.1,0,1000,NA,NA,selective plankton feeding,NA,NA,pelagic,1000,7.1,NA,NO
+Oncorhynchus gorbuscha,subtropical,subtropical,subtropical,76,4.49,3.3,9.3,0.5,0,250,741.4,1268.75,hunting macrofauna (predator),2,45,demersal,250,8.8,1375.775,HIGHLY COMMERCIAL
+Ophidion barbatum,subtropical,,subtropical,25.4,3.57,13.8,14.5,11,51,1456,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1405,3.5,NA,
+Osmerus eperlanus,temperate,,temperate,45,3.46,9.6,12,5.5,0,60,8875,45000,selective plankton feeding,2,12.75,pelagic,60,6.5,31375,
+Pagellus erythrinus,subtropical,,subtropical,73.2,3.48,17.2,21,12.2,0,300,21446.67,180116.67,hunting macrofauna (predator),1.75,14.33,pelagic,300,8.8,111505,
+Parablennius gattorugine,subtropical,,subtropical,30,2.73,17.4,19.8,9.9,3,32,NA,NA,grazing on aquatic plants,1,NA,demersal,29,9.9,NA,
+Paralepis coregonoides,deep-water,boreal,boreal,61,4.07,7.4,14,2.2,50,1032,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,982,11.8,NA,NO
+Paraliparis bathybius,deep-water,arctic,arctic,30.87,4.29,3.7,6.2,3.2,20,4009,NA,NA,hunting macrofauna (predator),NA,NA,demersal,3989,3,NA,NO
+Pegusa lascaris,subtropical,,subtropical,48.8,3.29,18.1,27.6,10.6,5,350,NA,NA,hunting macrofauna (predator),4,NA,demersal,345,17,NA,
+Petromyzon marinus,temperate,boreal,boreal,120,4.37,7.1,13.1,1.8,1,4099,141493.5,240284.5,hunting macrofauna (predator),5.67,NA,demersal,4098,11.3,261635.75,NO
+Pholis gunnellus,polar,boreal,boreal,30.5,3.54,9.5,11.9,4.3,0,100,NA,NA,NA,1,NA,demersal,100,7.6,NA,NO
+Phycis blennoides,temperate,boreal,boreal,110,3.66,9.1,14.6,5.4,10,1200,NA,NA,hunting macrofauna (predator),3,NA,pelagic,1190,9.2,NA,COMMERCIAL
+Platichthys flesus,temperate,boreal,boreal,60,3.32,10.2,14.2,7.2,1,100,621320.3,1886736.13,hunting macrofauna (predator),2.93,21.47,demersal,99,7,1564688.363,COMMERCIAL
+Pleuronectes platessa,temperate,boreal,boreal,122,3.17,10.2,12.4,6.8,0,200,133776.47,225433.33,hunting macrofauna (predator),3.25,28.07,demersal,200,5.6,246493.1373,HIGHLY COMMERCIAL
+Pollachius pollachius,temperate,boreal,boreal,130,4.32,8.9,11.9,7,40,200,NA,NA,hunting macrofauna (predator),NA,39.4,pelagic,160,4.9,NA,COMMERCIAL
+Pollachius virens,temperate,boreal,boreal,130,4.31,7,10.2,0.5,37,364,448500,8622500,hunting macrofauna (predator),4.4,55.15,demersal,327,9.7,4759750,HIGHLY COMMERCIAL
+Polyprion americanus,deep-water,,deep-water,210,4.14,9.4,19,5.2,40,600,3000000,11900000,hunting macrofauna (predator),NA,76.4,demersal,560,13.8,8950000,
+Pomatoschistus flavescens,temperate,,temperate,6,3.18,10.5,13.1,8.9,0,20,NA,NA,selective plankton feeding,NA,NA,demersal,20,4.2,NA,
+Pomatoschistus lozanoi,temperate,,temperate,8,3.13,10,11.7,7.3,70,80,410,2453,variable,1,NA,demersal,10,4.4,1636.5,
+Pomatoschistus microps,temperate,,temperate,9,3.29,10.8,16.1,9,0,12,NA,NA,hunting macrofauna (predator),0.8,NA,demersal,12,7.1,NA,
+Pomatoschistus minutus,temperate,boreal,boreal,11,3.38,9.4,12.2,7,4,200,3390,3643,hunting macrofauna (predator),0.7,6.25,demersal,196,5.2,5211.5,NO
+Pomatoschistus norvegicus,temperate,boreal,boreal,8,3.31,8.6,11.4,6.8,18,325,NA,NA,hunting macrofauna (predator),NA,NA,demersal,307,4.6,NA,NO
+Pomatoschistus pictus,temperate,,temperate,6,3.12,10.5,14.6,8.2,1,55,NA,NA,hunting macrofauna (predator),NA,NA,demersal,54,6.4,NA,
+Raja brachyura,temperate,boreal,boreal,125,3.76,10.3,16.2,7.1,10,380,35,90,hunting macrofauna (predator),NA,88.23,demersal,370,9.1,80,NO
+Raja clavata,subtropical,subtropical,subtropical,139,3.84,10.7,15.8,7.1,5,1020,45.5,111.75,hunting macrofauna (predator),NA,73.58,demersal,1015,8.7,101.375,COMMERCIAL
+Raja microocellata,temperate,,temperate,87,3.94,12,15.4,10.4,1,100,54,61,hunting macrofauna (predator),NA,71.7,demersal,99,5,84.5,
+Raja montagui,temperate,boreal,boreal,83.5,3.88,9.9,16,7,8,530,24,60,hunting macrofauna (predator),NA,59.54,demersal,522,9,54,NO
+Raja undulata,subtropical,,subtropical,100,3.5,13.2,17.1,9.8,50,200,NA,NA,hunting macrofauna (predator),8.5,77.92,demersal,150,7.3,NA,NO
+Rajella fyllae,deep-water,boreal,boreal,60,3.37,3.6,9.5,0.7,147,2055,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1908,8.8,NA,NO
+Rajella lintea,deep-water,boreal,boreal,125,3.78,5.2,8,1,150,2117,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1967,7,NA,NO
+Raniceps raninus,temperate,boreal,boreal,30,3.77,10.4,12.5,8.5,0,100,NA,NA,hunting macrofauna (predator),NA,NA,demersal,100,4,NA,NO
+Reinhardtius hippoglossoides,polar-boreal,arctic-boreal,arctic-boreal,130,4.38,3,4.2,0.5,1,2200,16130,145800,hunting macrofauna (predator),9,63.74,pelagic,2199,3.7,89030,HIGHLY COMMERCIAL
+Rhodichthys regina,deep-water,arctic,arctic,37.82,3.55,3.5,4.2,-0.9,1080,2365,NA,NA,NA,NA,NA,demersal,1285,5.1,NA,NO
+Salmo salar,temperate,boreal,boreal,150,4.5,9.3,15.3,1.5,0,210,7034.3,12177.1,hunting macrofauna (predator),2.15,55.57,pelagic,210,13.8,13122.85,HIGHLY COMMERCIAL
+Salmo trutta,temperate-subtrop,,temperate,170.8,3.36,10.1,15.8,6.5,0,28,882.22,4543.33,hunting macrofauna (predator),2.53,29.76,pelagic,28,9.3,3153.888889,COMMERCIAL
+Sarda sarda,subtropical,,subtropical,101.45,4.23,10.7,23.4,7,80,200,NA,NA,hunting macrofauna (predator),NA,38.73,pelagic,120,16.4,NA,HIGHLY COMMERCIAL
+Sardina pilchardus,temperate-subtrop,,temperate,33.55,3.06,10.3,17.3,7.1,10,100,32022.5,148302.2,selective plankton feeding,NA,14.32,pelagic,90,10.2,106173.6,HIGHLY COMMERCIAL
+Sarpa salpa,subtropical,,subtropical,62.22,2,18.8,24,15.3,5,70,NA,NA,grazing on aquatic plants,NA,15.5,pelagic,65,8.7,NA,COMMERCIAL
+Schedophilus medusophagus,subtropical,subtropical,subtropical,55,4,8.1,13.3,4.5,200,358,NA,NA,selective plankton feeding,NA,NA,pelagic,158,8.8,NA,NO
+Scomber japonicus,subtropical,,subtropical,64,3.38,20.7,27.7,9.3,0,300,206417.5,873841.25,hunting macrofauna (predator),2,30.31,pelagic,300,18.4,643338.125,HIGHLY COMMERCIAL
+Scomber scombrus,temperate,boreal,boreal,66.6,3.63,10.2,17.5,7,0,1000,192436.36,788084.07,variable,1.75,28.49,pelagic,1000,10.5,586478.3994,HIGHLY COMMERCIAL
+Scomberesox saurus,subtropical,subtropical,subtropical,50,3.84,14.4,22,6.5,0,30,NA,NA,selective plankton feeding,NA,26.5,pelagic,30,15.5,NA,NO
+Scophthalmus maximus,temperate,boreal,boreal,122,4.36,9.4,11.9,5.9,20,70,5000000,15000000,hunting macrofauna (predator),3,32.45,demersal,50,6,12500000,COMMERCIAL
+Scophthalmus rhombus,temperate,boreal,boreal,75,4.42,11.2,19.5,8.4,5,50,NA,NA,hunting macrofauna (predator),5,32.2,demersal,45,11.1,NA,COMMERCIAL
+Scyliorhinus canicula,subtropical,subtropical,subtropical,100,3.82,10.1,16.2,7.2,10,780,48.33,70.25,hunting macrofauna (predator),3,53.86,demersal,770,9,83.45833333,NO
+Scyliorhinus stellaris,subtropical,subtropical,subtropical,170,4.03,10.9,19.5,7.8,1,400,29,50.67,hunting macrofauna (predator),NA,78,demersal,399,11.7,54.33333333,NO
+Sebastes mentella,polar-temperate,boreal,boreal,77.5,4.19,3.6,6.6,0.4,300,1441,19387.5,78900,hunting macrofauna (predator),11,31.66,pelagic,1141,6.2,58837.5,COMMERCIAL
+Sebastes norvegicus,polar-temperate,boreal,boreal,100,4.04,3.7,9.3,0.6,100,1000,31791.75,232947,hunting macrofauna (predator),10,33.23,pelagic,900,8.7,148265.25,HIGHLY COMMERCIAL
+Sebastes viviparus,temperate,boreal,boreal,66.5,4.03,7.8,9.8,6.8,50,300,19219.67,137397.67,hunting macrofauna (predator),20,12.5,demersal,250,3,87918.5,NO
+Solea solea,temperate,,temperate,85.4,3.21,11.4,20,9,0,150,76000,303850,hunting macrofauna (predator),2.75,26.19,demersal,150,11,227925,HIGHLY COMMERCIAL
+Somniosus microcephalus,boreal,arctic-boreal,arctic-boreal,550,4.22,3.6,9.3,0.6,0,2992,10,NA,hunting macrofauna (predator),NA,335.5,pelagic,2992,8.7,10,NO
+Spinachia spinachia,temperate,,temperate,26.84,3.5,9.9,12.5,7.5,0,20,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,20,5,NA,NO
+Spondyliosoma cantharus,subtropical,,subtropical,73.2,3.34,10.2,17.2,7,5,300,35367.33,270014.67,variable,2,20.54,pelagic,295,10.2,170374.6667,
+Sprattus sprattus,temperate,boreal,boreal,19.52,3.01,9.5,15.3,4.3,10,150,23292.64,26704.55,selective plankton feeding,1.5,10.05,pelagic,140,11,36644.91558,HIGHLY COMMERCIAL
+Squalus acanthias,temperate-subtrop,boreal,boreal,81.88,4.37,9.9,18.7,4.2,0,1460,4.71,13,hunting macrofauna (predator),8.75,77.08,pelagic,1460,14.5,11.21428571,NO
+Symphodus bailloni,subtropical,,subtropical,24.4,3.5,11.3,18.9,8.9,1,50,NA,NA,NA,NA,NA,demersal,49,10,NA,
+Symphodus melops,temperate,,temperate,34.16,3.38,10.5,17.2,8.8,0,50,NA,NA,hunting macrofauna (predator),2,12.83,demersal,50,8.4,NA,
+Syngnathus acus,subtropical,,subtropical,50,3.33,17.7,22.6,10.3,0,110,101.5,341,hunting macrofauna (predator),NA,18.26,demersal,110,12.3,272,
+Syngnathus rostellatus,temperate,,temperate,18.5,3.69,10.7,12.5,9.4,1,18,NA,NA,selective plankton feeding,NA,10,demersal,17,3.1,NA,
+Syngnathus typhle,temperate,,temperate,35,4.31,14,19.6,8.8,1,20,100,250,selective plankton feeding,1,NA,demersal,19,10.8,225,
+Taurulus bubalis,temperate,boreal,boreal,30.5,3.59,9.5,11.9,7,0,200,NA,NA,hunting macrofauna (predator),NA,NA,demersal,200,4.9,NA,NO
+Trachinus draco,temperate,boreal,boreal,53,4.18,10.9,18.7,8.7,1,150,NA,NA,hunting macrofauna (predator),NA,12.01,demersal,149,10,NA,NO
+Trachipterus arcticus,deep-water,,deep-water,300,4.5,5.2,10.4,2.7,300,600,500000,NA,hunting macrofauna (predator),14,NA,pelagic,300,7.7,500000,
+Trachurus trachurus,temperate-subtrop,subtropical,subtropical,70,3.71,13.3,16.6,10.6,0,1050,129758.73,419977.75,hunting macrofauna (predator),3.33,22.91,pelagic,1050,6,339747.6023,HIGHLY COMMERCIAL
+Trigla lyra,deep-water,,deep-water,60,3.82,13.1,14.9,8.5,10,700,NA,NA,hunting macrofauna (predator),NA,NA,demersal,690,6.4,NA,
+Triglops murrayi,temperate,arctic-boreal,arctic-boreal,24.4,3.45,4.2,8,0.5,7,530,100,NA,hunting macrofauna (predator),NA,NA,demersal,523,7.5,100,NO
+Triglops nybelini,polar,arctic,arctic,24.61,3.29,1.7,4.5,-0.1,71,1270,NA,NA,hunting macrofauna (predator),NA,NA,demersal,1199,4.6,NA,NO
+Triglops pingelii,temperate,arctic-boreal,arctic-boreal,24.64,3.42,0.4,6.7,-1.6,0,930,NA,NA,hunting macrofauna (predator),NA,NA,demersal,930,8.3,NA,NO
+Trisopterus esmarkii,temperate,boreal,boreal,35,3.68,7.8,10.1,5.9,50,300,27000,207745,hunting macrofauna (predator),1,15.15,pelagic,250,4.2,130872.5,HIGHLY COMMERCIAL
+Trisopterus luscus,temperate,boreal,boreal,46,3.73,9.6,12.8,7.1,30,100,207479,835997,hunting macrofauna (predator),1,21.5,pelagic,70,5.7,625477.5,COMMERCIAL
+Trisopterus minutus,temperate,boreal,boreal,40,3.73,10,13,7.2,1,440,1236,21463,hunting macrofauna (predator),1,13.43,pelagic,439,5.8,11967.5,COMMERCIAL
+Urophycis chuss,temperate,boreal,boreal,66,3.72,5,11.1,1.6,35,1152,NA,NA,variable,3,24.5,demersal,1117,9.5,NA,COMMERCIAL
+Xenodermichthys copei,deep-water,deep-water,deep-water,31,3.19,7.6,19.7,3,100,2650,NA,NA,variable,NA,NA,pelagic,2550,16.7,NA,NO
+Zeugopterus norvegicus,temperate,boreal,boreal,14.64,3.98,10,12.5,7.3,10,200,NA,NA,hunting macrofauna (predator),NA,NA,pelagic,190,5.2,NA,NO
+Zeugopterus punctatus,temperate,boreal,boreal,30.5,3.99,10.4,12.5,8.7,1,50,NA,NA,hunting macrofauna (predator),NA,NA,demersal,49,3.8,NA,NO
+Zeugopterus regius,subtropical,,subtropical,20,3.99,10.1,13,7.2,10,180,NA,NA,hunting macrofauna (predator),NA,NA,demersal,170,5.8,NA,
+Zeus faber,temperate,boreal,boreal,90,4.5,13.6,23.7,6.7,5,400,NA,NA,hunting macrofauna (predator),3,31.44,pelagic,395,17,NA,COMMERCIAL
+Zoarces viviparus,temperate,boreal,boreal,52,3.47,9.4,11.3,7.3,0,40,NA,NA,hunting macrofauna (predator),2,17,demersal,40,4,NA,NO
