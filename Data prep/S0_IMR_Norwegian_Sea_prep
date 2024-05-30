@@ -85,4 +85,4 @@ sum(sp_c != sp_check) # all names good
 norwesea = norwesea %>% dplyr::rename(depth = bot_depth)
 
 #Save the Norwegian Sea data
-write.csv(norwesea, "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM/data/NORWAY_clean_from_raw1.csv")
+write.csv(norwesea, "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM/data/NORWAY_clean_from_raw.csv")
