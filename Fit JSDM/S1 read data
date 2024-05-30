@@ -66,7 +66,7 @@ imp.var <- c("depth", "sbt",
 write(unique(data$species),"data/species_107.txt")
 
 ####--------       CO-LINEARITY OF ENVIRONMENTAL PREDICTORS      ----------------------####
-
+# In an initial run, SST was included, but was afterwards removed due to VIF > 4
 corDF2 <- data.frame(DF2[,imp.var]) # columns with predictors for the whole dataset 
 cut <- 4 # VIF cutoff, 3 - 4 is usually the arbitrarily selected cutoff 
 
