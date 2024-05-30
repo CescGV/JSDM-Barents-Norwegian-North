@@ -1,0 +1,125 @@
+
+ ## Manually parallelized Cross-Validation
+
+## 1. Library
+
+library(Hmsc)
+library(doParallel)
+library(foreach)
+
+source("cross.val.diag.R")
+
+# 2. Define folds,chains, load  data & models
+load(paste("fitted_hmsc_models.RData", sep = ""))    
+name = "fitted_hmsc_models"
+
+nfolds = 5
+nChains = 4
+thin = 500
+samples = 250
+load("models/allData.R")
+
+model.pa = c(models.fitted.cv[[1]][[1]],
+             models.fitted.cv[[2]][[1]],
+             models.fitted.cv[[3]][[1]],
+             models.fitted.cv[[4]][[1]])
+
+model.ab = c(models.fitted.cv[[1]][[2]],
+             models.fitted.cv[[2]][[2]],
+             models.fitted.cv[[3]][[2]],
+             models.fitted.cv[[4]][[2]])
+models = list(model.pa, model.ab)
+
+## 3. Partition the data outside the CV loop
+partition = sample(1:nfolds, nrow(models[[1]]$Y), replace = T)
+## 4. Make clusters for parallel computing
+
+cl <- makeCluster(nfolds)
+registerDoParallel(cl)
+## 5. Run the CV loop
+cv.res = foreach(fold.num = c(1:nfolds)) %dopar%{
+    ## Library after dopar
+    library(Hmsc)
+    library(doParallel)
+    library(foreach)   
+    ## I select the data for fitting and validation
+    fit.indices <- which(partition != fold.num)
+    test.indices <- which(partition == fold.num)
+    ## Build models with subset data for fitting (training) and testing
+    m1 <- Hmsc(Y = models[[1]]$Y[fit.indices,],
+               XData = models[[1]]$XData[fit.indices,],
+               XFormula = models[[1]]$XFormula,
+               phyloTree = models[[1]]$phyloTree,
+               XSelect = models[[1]]$XSelect,
+               distr="probit")
+    m2 <-  Hmsc(Y = models[[2]]$Y[fit.indices,],
+                YScale = T,
+                XData = models[[2]]$XData[fit.indices,],
+                XFormula = models[[2]]$XFormula,
+                XSelect = models[[2]]$XSelect,
+                phyloTree = models[[2]]$phyloTree,
+                distr = "normal")   
+    models.cv <- list(m1, m2)
+    modelnames.cv = c("PA.model", "AB.model")
+    ## Now I need to parallely fit all the 4 chains of each model:
+    cl.c <- makeCluster(nChains)
+    registerDoParallel(cl.c)
+    models.fitted.cv = foreach(chain.num = c(1:nChains)) %dopar% {
+        ## Library after dopar    
+        library(Hmsc)
+        library(doParallel)
+        library(foreach)
+        ##Characteristics of the MCMC
+        options(mc.cores = 1)
+        RhpcBLASctl::blas_set_num_threads(1)
+        models.fitted.chain = list()      
+        ## Sequential fitting of PA and Biomass model
+        set.seed(chain.num)
+        for (model in 1:length(models.cv)) {
+            start <- Sys.time()
+            print(paste0("model = ",modelnames[model]))
+            m <- models.cv[[model]]
+            m <- Hmsc::sampleMcmc(m, samples = samples,
+                                  thin=thin,
+                                  adaptNf = rep(ceiling(0.4*samples*thin),m$nr),
+                                  transient = ceiling(0.5*samples*thin),
+                                  nChains = 1, nParallel = 0) #nParallel
+            models.fitted.chain[[model]] <- m
+            end <- Sys.time()
+            print(end - start)
+        }
+        models.fitted.chain
+        }
+    stopCluster(cl.c)
+    ## Join the 4 models of 1 chain to 1 model of 4 chains:
+    model.cv.pa = c(models.fitted.cv[[1]][[1]],
+                    models.fitted.cv[[2]][[1]],
+                    models.fitted.cv[[3]][[1]],
+                    models.fitted.cv[[4]][[1]])
+    model.cv.ab = c(models.fitted.cv[[1]][[2]],
+                    models.fitted.cv[[2]][[2]],
+                    models.fitted.cv[[3]][[2]],
+                    models.fitted.cv[[4]][[2]])
+    ## This is the final bimodel of pa and abundance for 1 CV fold
+    models.cv = list(model.cv.pa, model.cv.ab)
+    ## Validate with 1/10 of the data (test set)
+    ## Compute predicted values using HMSC's computePredictedValues
+    library(pROC)
+    library(Hmsc)
+    obspa = models[[1]]$Y[test.indices,]
+    obs.ab= models[[2]]$Y[test.indices,]
+    predpa = predict(model.cv.pa,
+                     XData = models[[1]]$XData[test.indices,],
+                     expected = T)
+    predab = predict(model.cv.ab,
+                     XData = models[[2]]$XData[test.indices,],
+                     expected = T)    
+    a =  cross.val.diag(pred = predpa, obs = obspa, model = model.cv.pa)
+    mean(a$AUC)  
+    b =  cross.val.diag(pred = predab, obs = obs.ab,model = model.cv.ab)
+    a$R2 = b$R2
+    a$Sp = colnames(Y)
+    return(a) 
+}
+stopCluster(cl)
+write.csv(cv.res, paste("crossval",thin,"_",samples,"_",name,".csv", sep = ""))
