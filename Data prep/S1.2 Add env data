@@ -1,3 +1,13 @@
+## This code builds upon the "data_ready_jsdm.csv" file obtained in "S1 Data cleaning"
+## All the environmental data was obtained in nmdc format and transformed to tif files.
+## Sea ice concentration, bottom temperature, and northward and eastward current components
+## were obtained from the Global Ocean Physics Reanalysis of Copernicus Marine repository
+## Bottom dissolved oxygen, and bottom primary productivity were obtained from the Global Ocean Biogeochemistry Hindcast from the same repository
+## Bottom depth was obtained from BioOracle
+## SIC is in annual mean, while the other variables are monthly means, except depth, with no temporal resolution
+
+## This code extracts the value of each variable per each month, at each site. 
+
 library(raster)
 
 sic = raster::stack("Env data/Present/SIC/SIC.tif")
@@ -95,17 +105,8 @@ ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = sbt))
 
 summary(sites)
 sites$sic[is.na(sites$sic)] = 0
-sites
-
-summary(sites)
-ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = dox))
-ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = phy))
-ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = sic))
-ggplot(sites) + geom_point(aes(x = longitude, y = latitude, col = sbt))
 
 sites = na.omit(sites)
 data = merge(sites,data)
 data = na.omit(data)
-colnames(data)
-dim(sites)
 save(data, file = "data/data_JSDM_full_new_IMR_2004_2022.Rdata")
