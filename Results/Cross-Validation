@@ -123,3 +123,5 @@ cv.res = foreach(fold.num = c(1:nfolds)) %dopar%{
 }
 stopCluster(cl)
 write.csv(cv.res, paste("crossval",thin,"_",samples,"_",name,".csv", sep = ""))
+
+# cv_mean.csv is the mean of the 5-fold CV
