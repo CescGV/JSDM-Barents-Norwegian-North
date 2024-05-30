@@ -1,0 +1,96 @@
+#==== S1 DATA GATHERING AND CLEANING  =====================================##
+
+##---  Authors : Cesc Gordó-Vilaseca 
+##---  Project : Third chapter Thesis
+##---  Date    : 07/08/2023
+
+##=============================================================================================================##
+##=================             RAW CLEANED DATA              =================================================
+
+wd <- "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM"
+setwd(wd)
+
+localDir <- "."
+data.directory <- file.path(localDir, "data")
+model.directory <- file.path(localDir, "models")
+
+## The North Sea data is obtained from:
+# https://github.com/AquaAuma/FishGlob_data/blob/main/outputs/Cleaned_data/NS-IBTS_clean.RData
+load(file = file.path(data.directory, "NS-IBTS_clean.RData")); norsea = data; rm(data)
+
+## The Barents Sea data is obtained from script: S0_IMR_Barents_Sea_prep.R
+barsea = read.csv(file = file.path(data.directory, "BARENTS_clean_from_new_raw.csv"))[,-1]
+
+## The Norwegian Sea data is obtained from script: S0_IMR_Norwegian_Sea_prep.R
+nowsea = read.csv(file = file.path(data.directory, "NORWAY_clean_from_raw.csv"))[,-1]
+
+table(nowsea$month)
+table(barsea$month)
+table(norsea$month)
+
+# 
+colnames(norsea)
+colnames(barsea)
+colnames(nowsea)
+
+data = norsea
+unique(data$gear)
+sort(unique(data$accepted_name))
+
+# I select records only at the species level
+data = data %>% filter(grepl(" ", accepted_name))
+
+# I select records only at the species level and after 2003
+data = data[data$year > 2003,]
+data = data[data$depth < 501,]
+data = data[,c("depth","month","latitude","longitude","year","accepted_name","wgt_cpue")]
+data = na.omit(data)
+colnames(barsea) = tolower(colnames(barsea))
+
+barsea = barsea %>% dplyr::select(colnames(data))
+nowsea = nowsea %>% dplyr::select(colnames(data))
+
+data = rbind(data, barsea, nowsea)
+colSums(is.na(barsea))
+sort(unique(data$accepted_name))
+
+## Check names and family (FAmily Myctophidae has to be at fam level, not species)
+a = worms::wormsbynames(unique(data$accepted_name))
+
+view(a)
+# Duplicates?
+
+dim(data) == dim(unique(data))
+# No duplicates
+unique(data$accepted_name)
+# 194 species
+data %>% dplyr::select(longitude, latitude, year) %>% distinct() %>% dim()
+# 16 539 hauls
+# I select records within the continental shelf > 500 m
+hist(data$depth)
+
+## Plot the data 
+ggplot(data) + geom_point(aes(x = longitude, y = latitude))
+
+hist(log(data$wgt_cpue))
+hist(data$wgt_cpue)
+
+data = data %>% dplyr::rename(species = accepted_name)
+## Eliminate very rare species that were sampled less than 100 times or less than 10 yrs
+#library(tidyverse)
+#
+sp_dropped1 = data %>% dplyr::select(species, longitude, latitude, year) %>% 
+  dplyr::group_by(species) %>% dplyr::count() %>% dplyr::filter(n < 100)
+
+sp_dropped2 = data %>% dplyr::select(species, year) %>% dplyr::distinct() %>%
+  dplyr::group_by(species) %>% dplyr::count() %>% filter(n < 10)
+
+sp_dropped = unique(c(sp_dropped1$species, sp_dropped2$species))
+data = data[!data$species %in% sp_dropped,]
+
+# The total final dataset includes 
+unique(data$species)
+dim(data)==dim(unique(data))
+
+dim(unique(cbind(data$longitude, data$latitude, data$year)))
+write.csv(data,"data/data_ready_jsdm.csv")
