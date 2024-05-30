@@ -1,0 +1,88 @@
+library(tidyverse)
+library(worms)
+
+setwd("C:/Users/06061016/OneDrive - Nord universitet/IMR1980-2017")
+
+# Norwegian Sea selection ------------------------------------------------------------------------
+# This data corresponds to the data at the NMDC 
+# https://ftp.nmdc.no/nmdc/IMR/btraal/btraal1980-2020.zip
+# This data is publicly accessible on demand, and here it is only used for the 
+# Norwegian Sea data. The Barents Sea data comes from the freely accessible 
+# "Barents Sea ecosystem survey fish diversity data export". 
+
+data  <- read.csv("total_completed_data.csv")
+
+# Filter for quality and shelf. Only keep gear in best condition and 3270-1
+# (same gear used in Barents Sea surveys) 
+
+data = data %>% filter(Year > 2003 & Gear %in% c("3270","3271") &
+                         Quality_haul %in% c(1,2) & 
+                         Quality_gear == 1 & 
+                         Opening < 100 & 
+                         Distance < 5 & 
+                         Total_abund > 0 &
+                         Bot_depth > 0 &
+                         Opening > 0,
+                         Species_code == 2 &
+                         Duration > 0 &
+                         Measurement %in% c(-1,1,9) &
+                         Total_weight > 0 &
+                         phylum == "Chordata" & 
+                         class %in% c("Actinopterygii","Elasmobranchii",
+                                      "Holocephali","Myxini","Petromyzonti"))
+
+# Eliminate unnecessary columns
+data = data[,-c(30:70)]
+
+# Transform distance nautical miles to km
+# 1nm <-> 1.852km
+data$Distance <- data$Distance*1.852
+
+range(data$Duration) # In hours
+range(data$Total_weight) # In hours
+
+## Calculate wgt_cpue as done in FishGlob as kg/hour
+
+data$wgt_cpue = data$Total_weight / data$Duration
+
+# Each site has a unique depth
+data %>% select(Longitude, Latitude, Month, Bot_depth) %>% distinct() %>%
+  group_by(Longitude, Latitude, Month) %>% count() %>% arrange(desc(freq))
+
+### But some records are repeated 
+dat = data %>% select(Year, Month, Longitude, Latitude,
+                       Duration, Bot_depth,Opening, Distance,Total_weight, Total_abund, Sex,
+                       valid_name,family, genus,wgt_cpue)
+
+# The duplicated lines here are due to subsetting, need to pool them together
+which(duplicated(dat))
+
+dat = dat %>% group_by(valid_name, Latitude, Longitude, 
+                       Year, Month, Bot_depth, Duration) %>% 
+  dplyr::summarize(Total_weight = sum(Total_weight))
+
+dat$wgt_cpue = dat$Total_weight / dat$Duration
+sum(duplicated(dat))
+### I separate regions in Barents and Norwegian sea
+### I decided these coordinates because its the lowest latitude that the IMR
+### publishes for the Barents Sea. 
+
+norwesea = dat %>% filter(Latitude > 61.883 & Latitude < 69.31667 & Longitude < 20)
+
+norwesea$accepted_name = norwesea$valid_name
+unique(norwesea$accepted_name)
+
+#These are wrong
+norwesea$accepted_name[norwesea$accepted_name == "Gobiusculus flavescens"] = "Pomatoschistus flavescens"
+norwesea$accepted_name[norwesea$accepted_name == "Phrynorhombus norvegicus"] = "Zeugopterus norvegicus"
+
+# I eliminate taxon levels at lower resolutions 
+norwesea = norwesea %>% filter(grepl(" ", accepted_name) &  (!grepl("spp", accepted_name)))
+sp_c = unique(norwesea$accepted_name)[grep(" ", unique(norwesea$accepted_name))]
+sp_check = rfishbase::validate_names(sp_c) 
+sum(sp_c != sp_check) # all names good
+
+norwesea = norwesea %>% dplyr::rename(depth = bot_depth)
+
+#Save the Norwegian Sea data
+write.csv(norwesea, "C:/Users/06061016/OneDrive - Nord universitet/Desktop/JSDM/data/NORWAY_clean_from_raw1.csv")
