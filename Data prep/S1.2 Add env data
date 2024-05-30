@@ -109,4 +109,10 @@ sites$sic[is.na(sites$sic)] = 0
 sites = na.omit(sites)
 data = merge(sites,data)
 data = na.omit(data)
+
+dim(sites)
+
+# At the end of 2023, the original dataset was slightly modified in the original database (FishGlob and NMDC)
+# This is why the code now returns 16,545 sites, instead of the 16,345 in the paper, and 108 species, instead of the 107 in the paper. 
+
 save(data, file = "data/data_JSDM_full_new_IMR_2004_2022.Rdata")
