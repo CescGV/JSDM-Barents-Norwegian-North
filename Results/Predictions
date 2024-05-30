@@ -1,0 +1,836 @@
+ ########################################################
+############# HMSC Results analysis ####################
+########################################################
+
+### --- 1. Model basic diagnostics (no CV) --- ####
+set.seed(1)
+
+## 1.1 Load the model##
+#four chains of the models and join it into 1 Hmsc object
+library(raster)
+library(Hmsc)
+#load("models_hmsc_barents.RData")
+
+load("models_hmsc_final.RData")
+
+models.pa = c(models.fitted.cv[[1]][[1]],
+              models.fitted.cv[[2]][[1]],
+              models.fitted.cv[[3]][[1]],
+              models.fitted.cv[[4]][[1]])
+models.ab = c(models.fitted.cv[[1]][[2]],
+              models.fitted.cv[[2]][[2]],
+              models.fitted.cv[[3]][[2]],
+              models.fitted.cv[[4]][[2]])
+models = list(models.pa, models.ab)
+
+
+OmegaCor=computeAssociations(models.pa)
+supportLevel=0.95
+
+toPlot=((OmegaCor[[1]]$support>supportLevel) +(OmegaCor[[1]]$support<(1-supportLevel))>0)*OmegaCor[[1]]$mean
+
+pdf("associations.pdf", height = 20, width = 20)
+corrplot::corrplot(toPlot,method="color", col=colorRampPalette(c("blue","white","red"))(200), tl.cex=.6,tl.col="black", title=paste("randomeffectlevel:",models.pa$rLNames[1]),mar=c(0,0,1,0))
+dev.off()
+
+## 1.2 Calculate the convergence of the estimates
+ma.b = NULL
+ma.g = NULL
+
+mpost.PA = convertToCodaObject(models[[1]])
+mpost.cpue = convertToCodaObject(models[[2]])
+
+es.beta.pa  = effectiveSize(mpost.PA$Beta)
+es.beta.cpue = effectiveSize(mpost.cpue$Beta)
+es.gamma.PA = effectiveSize(mpost.PA$Gamma)
+es.gamma.cpue = effectiveSize(mpost.cpue$Gamma)
+
+es = cbind(es.beta.pa, es.beta.cpue,es.gamma.PA,es.gamma.cpue)
+
+for(m in 1:length(models)){
+    mpost = convertToCodaObject(models[[m]])
+    psrf.beta = gelman.diag(mpost$Beta,
+                            multivariate=FALSE)$psrf
+    psrf.gamma = gelman.diag(mpost$Gamma,
+                             multivariate = F)$psrf
+    tmp.b = summary(psrf.beta)
+    tmp.g = summary(psrf.gamma)   
+    ma.b = cbind(ma.b, psrf.beta)
+    ma.g = cbind(ma.g,psrf.gamma)
+}
+
+summary(ma.b)
+
+summary(ma.g)
+
+ma = list(ma.b, ma.g, es)
+
+saveRDS(ma, "convergence_data.rds")
+write.csv(summary(ma), "convergence_summary.csv")
+## 1.3 Calculate explicative power
+
+a = computePredictedValues(models[[1]])
+b = computePredictedValues(models[[2]])
+eva.pa = evaluateModelFit(hM = models[[1]], predY = a)
+eva.ab = evaluateModelFit(hM = models[[2]], predY = b)
+
+summary(eva.pa$AUC)
+summary(eva.ab$R2)
+
+pdf("histograms.pdf", height = 5)
+par(mfrow = c(1,2))
+hist(eva <- pa$AUC)
+hist(eva <- ab$R2)
+dev.off()
+
+
+## 1.4 Plot variance partitioning
+
+VP = computeVariancePartitioning(models.pa)
+
+pdf("VarPar_barents.pdf")
+plotVariancePartitioning(models.pa,VP=VP)
+dev.off()
+
+saveRDS(VP, "VarParPA.Rdata")
+
+VP2 = computeVariancePartitioning(models.ab)
+pdf("VarPar2_barents.pdf")
+plotVariancePartitioning(models.pa,VP=VP, main = "PA model")
+plotVariancePartitioning(models.ab,VP=VP2, main = "Biomass model")
+dev.off()
+
+saveRDS(VP2, "VarParBIOMASS.Rdata")
+
+## 1.5 Plot environmental effects
+
+postBeta = getPostEstimate(models.pa, parName = "Beta")
+
+pdf("Environmental_effects_barents.pdf", height = 10, width = 5)
+plotBeta(models.pa,
+         post=postBeta,
+         param="Support",supportLevel=0.95)
+dev.off()
+
+## 1.6 Plot biotic coocurrences
+
+mpost=convertToCodaObject(models.pa)
+summary(mpost$Rho)
+
+mpost=convertToCodaObject(models.ab)
+summary(mpost$Rho)
+
+## 1.7 Plot MCMC chains
+
+mcoda.pa <- convertToCodaObject(models.pa)
+mcoda.ab <- convertToCodaObject(models.ab)
+
+saveRDS(mcoda.pa, file = "mcoda_pa.RData")
+saveRDS(mcoda.ab, file = "mcoda_ab.RData")
+
+pdf("MCMC_chains_barents.pdf")
+plot(mcoda$Beta[,c(1:10)])
+dev.off()
+
+## 1.8 Plot biotic residuals
+
+OmegaCor = computeAssociations(models.pa)
+OmegaCorab = computeAssociations(models.ab)
+
+supportLevel = 0.95
+
+toPlot = ((OmegaCor[[1]]$support>supportLevel) + (OmegaCor[[1]]$support<(1-supportLevel))>0)*OmegaCor[[1]]$mean
+
+toPlotab = ((OmegaCorab[[1]]$support>supportLevel) + (OmegaCor[[1]]$support<(1-supportLevel))>0)*OmegaCor[[1]]$mean
+
+pdf("biotic_relationships_natcomms.pdf", width = 10, height = 10)
+corrplot(toPlot, method = "color", col=colorRampPalette(c("blue","white","red"))(200), tl.cex=.6, tl.col="black", title=paste("Spatial co-occurrences in the Occurrence model"), mar=c(0,0,1,0))
+corrplot(toPlotab, method = "color", col=colorRampPalette(c("blue","white","red"))(200), tl.cex=.6, tl.col="black", title=paste("Spatial co-occurrences in the Biomass model"), mar=c(0,0,1,0))
+dev.off()
+
+### --- 2. Make  projections --- ####
+
+## 2.1 Remove random effects from model
+
+models.pa$studyDesign = NULL
+models.pa$ranLevels = NULL
+models.pa$rL = NULL
+models.pa$rLNames = NULL
+models.pa$ranLevelsUsed = NULL
+models.pa$nr = 0
+models.ab$studyDesign = NULL
+models.ab$ranLevels = NULL
+models.ab$rL = NULL
+models.ab$rLNames = NULL
+models.ab$ranLevelsUsed = NULL
+models.ab$nr = 0
+models = list(models.pa, models.ab)
+
+## 2.2 Load future environmental variables
+library(raster)
+load("Env data/layers_historic_eqsize.Rdata")
+load("Env data/layers_historic.Rdata")
+
+load("Env data/all_layers.Rdata")
+load("Env data/all_layers_eqsize.Rdata")
+
+## Add CRS
+
+## WGS84 projection
+all.layers = lapply(all.layers,function(Y) {lapply(Y,function(X) {crs(X)= "+proj=longlat +datum=WGS84 +no_defs"
+    return(X)})})
+
+## Equal area projection
+all.layers.eqsize = lapply(all.layers.eqsize,function(Y) {lapply(Y,function(X) {crs(X)= "+proj=laea +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
+    return(X)})})
+
+rasterStackToDataFrame <- function(rasterStack) {
+    ## Convert raster stack to a matrix
+    rasterMatrix <- as.matrix(rasterStack)
+    ## Convert matrix to data frame
+    rasterDataFrame <- as.data.frame(rasterMatrix)
+    ## Remove rows with all NA values
+    rasterDataFrame <- rasterDataFrame[complete.cases(rasterDataFrame), ]
+    return(rasterDataFrame)
+}
+
+layers.historic = layers_historic
+layers.historic.eqsize = layers_historic_eqsize
+
+## Add historical layers
+
+all.layers[[length(all.layers) + 1]] =  list(layers.historic,layers.historic,layers.historic)
+names(all.layers[[9]]) = c("126", "245", "585")
+      
+all.layers.eqsize[[length(all.layers.eqsize) + 1]] =  list(layers.historic.eqsize,layers.historic.eqsize,layers.historic.eqsize)
+names(all.layers.eqsize[[9]]) = c("126", "245", "585")
+
+## Transform them to data frame
+## Normal projection
+newr = lapply(all.layers,function(Y) lapply(Y,rasterStackToDataFrame))
+all.env <- lapply(newr, function(Y) lapply(Y, function(X) {X[complete.cases(X),]}))
+
+##Eqsize projection
+newr.eqs = lapply(all.layers.eqsize,function(Y) lapply(Y,rasterStackToDataFrame))
+newr[[length(newr)+1]] = layers.historic
+all.env.eqs <- lapply(newr.eqs, function(Y) lapply(Y, function(X) {X[complete.cases(X),]}))
+
+### 2.3 Make future projections and save ###
+## 2.3.1 Normal projections 
+sp.grad <- lapply(all.env, function(y)lapply(y,function(x)
+    prepareGradient(models[[1]], XDataNew = x)))
+##  Presence Absence ##
+
+predY <- lapply(sp.grad, function(y) lapply(y, function(x){
+    predict(models[[1]], Gradient = x, type = "response", expected = T)}))
+predY.mean = lapply(predY, function(y) lapply(y, function(x)
+    Reduce("+", x)/length(x)))
+predY.sd = lapply(predY, function(y) lapply(y, function(x)
+    apply(simplify2array(x),c(1,2),sd)))
+saveRDS(predY.mean, "predY_mean.rds")
+saveRDS(predY.sd, "predY_sd.rds")
+
+## CPUE ##
+predY.cpue <- lapply(sp.grad, function(y) lapply(y, function(x){
+    predict(models[[2]], Gradient = x, type = "response",expected = F)}))
+predY.cpue.exp <- lapply(predY.cpue, function(y) lapply(y, function(x) lapply(x,function(h)
+    exp(h))))
+predY.cpue.mean.exp = lapply(predY.cpue.exp, function(y) lapply(y, function(x)
+    Reduce("+", x)/length(x)))
+predY.cpue.sd.exp = lapply(predY.cpue.exp, function(y) lapply(y, function(x)
+    apply(simplify2array(x),c(1,2),sd)))
+predY.cpue.mean = lapply(predY.cpue, function(y) lapply(y, function(x)
+    Reduce("+", x)/length(x)))
+predY.cpue.sd = lapply(predY.cpue, function(y) lapply(y, function(x)
+    apply(simplify2array(x),c(1,2),sd)))
+saveRDS(predY.cpue.mean, "predY_cpue_mean.rds")
+saveRDS(predY.cpue.sd, "predY_cpue_sd.rds")
+saveRDS(predY.cpue.mean.exp, "predY_cpue_mean_exp.rds")
+saveRDS(predY.cpue.sd.exp, "predY_cpue_sd_exp.rds")
+
+## 2.3.2 Equal area projections ######
+
+sp.grad.eqs <- lapply(all.env.eqs, function(y)lapply(y,function(x)
+    prepareGradient(models[[1]], XDataNew = x)))
+
+##  Presence Absence ##
+predY.eqs <- lapply(sp.grad.eqs, function(y) lapply(y, function(x){
+    predict(models[[1]], Gradient = x, type = "response", expected = T)}))
+predY.eqs.mean = lapply(predY.eqs, function(y) lapply(y, function(x)
+    Reduce("+", x)/length(x)))
+predY.eqs.sd = lapply(predY.eqs, function(y) lapply(y, function(x)
+    apply(simplify2array(x),c(1,2),sd)))
+saveRDS(predY.eqs.mean, "predY_eqs_mean.rds")
+saveRDS(predY.eqs.sd, "predY_eqs_sd.rds")
+
+## CPUE ##
+predY.cpue.eqs <- lapply(sp.grad.eqs,function(y) lapply(y,function(x){
+    predict(models[[2]], Gradient = x, type = "response", expected = T)}))
+predY.cpue.exp.eqs <- lapply(predY.cpue.eqs, function(y)
+    lapply(y, function(x) lapply(x,function(h) exp(h))))
+
+predY.cpue.mean.exp.eqs = lapply(predY.cpue.exp.eqs,
+                             function(y) lapply(y, function(x)
+                                 Reduce("+", x)/length(x)))
+predY.cpue.sd.exp.eqs = lapply(predY.cpue.exp.eqs, function(y)
+    lapply(y, function(x)
+    apply(simplify2array(x),c(1,2),sd)))
+predY.cpue.mean.eqs = lapply(predY.cpue.eqs,
+                             function(y) lapply(y, function(x)
+                                 Reduce("+", x)/length(x)))
+predY.cpue.sd.eqs = lapply(predY.cpue.eqs,
+                           function(y) lapply(y, function(x)
+                               apply(simplify2array(x),c(1,2),sd)))
+saveRDS(predY.cpue.mean.eqs, "predY_cpue_eqs_mean.rds")
+saveRDS(predY.cpue.sd.eqs, "predY_cpue_eqs_sd.rds") 
+saveRDS(predY.cpue.mean.exp.eqs, "predY_cpue_eqs_mean_exp.rds")
+saveRDS(predY.cpue.sd.exp.eqs, "predY_cpue_eqs_sd_exp.rds")
+
+a = readRDS("predY_cpue_eqs_mean.rds")
+
+### --- 3 Data analysis --- ####
+## 3.1 Load predictions 
+
+a.PA.mean = readRDS("predY_mean.rds")
+a.PA.eqs.mean = readRDS("predY_eqs_mean.rds")
+a.cpue.mean = readRDS("predY_cpue_mean_exp.rds")
+a.cpue.eqs.mean = readRDS("predY_cpue_eqs_mean_exp.rds")
+
+## 3.1.1 Calcualte habitat and best habitat
+## This is the threshold that per species
+
+load("models/allData.R")
+
+thresh = apply(Y, 2, function(x)
+      min(x[x!=0])/2)
+
+PA.hab = a.PA.mean
+PA.hab.eqs = a.PA.eqs.mean
+
+cpue.hab = vector("list", 9)
+for (i in 1:9) {
+    for (k in 1:3){
+        cpue.hab[[i]][[k]] =
+            a.cpue.mean[[i]][[k]] *
+            a.PA.mean[[i]][[k]]
+}}
+
+
+cpue.hab <- lapply(cpue.hab,function(x) lapply(x, threshold_matrix, thresh = thresh))
+
+cpue.hab.eqs = vector("list", 9)
+for (i in 1:9) {
+    for (k in 1:3){
+        cpue.hab.eqs[[i]][[k]] =
+            a.cpue.eqs.mean[[i]][[k]] *
+            PA.hab.eqs[[i]][[k]]
+}}
+
+cpue.hab.eqs <- lapply(cpue.hab.eqs,function(x) lapply(x, threshold_matrix, thresh = thresh))
+
+p90.cpue = apply(cpue.hab[[9]][[1]],2, function(col){
+    non.zero.values <- col[col != 0]
+    quantile(non.zero.values,
+             probs = 0.9)})
+
+p90.cpue.eqs = apply(cpue.hab.eqs[[9]][[1]],2, function(col){
+    non.zero.values <- col[col != 0]
+    quantile(non.zero.values,
+             probs = 0.9)})
+
+
+cpue.best.hab <- lapply(cpue.hab,function(x)
+    lapply(x, threshold_matrix, thresh = p90.cpue))
+
+
+cpue.best.hab.eqs <- lapply(cpue.hab.eqs,function(x)
+    lapply(x, threshold_matrix, thresh = p90.cpue.eqs))
+
+## 3.2 Calculate centroids of PA and Abundance
+
+sel.sp = read.csv("cv_sel.csv")[,-1]
+
+## In the case of CPUE, I multiply per PA (Hurdle model)
+
+coo = coordinates(layers.historic.eqsize$depth)[!is.na(values(layers.historic.eqsize$depth)),]
+coo = data.frame(coo/1000)
+
+## Initialize a list to store the weighted means
+weighted.means.l <- list()
+weighted.means.l.cpue <- list()
+weighted.means.l.best.cpue <- list()
+
+cpue.hab.eqs.sel = lapply(cpue.hab.eqs, function(Y) lapply(Y,function(X)
+    X = X[,which(colnames(cpue.hab.eqs[[1]][[1]]) %in% sel.sp$Sp)]))
+
+cpue.hab.sel = lapply(cpue.hab, function(Y) lapply(Y,function(X)
+    X = X[,which(colnames(cpue.hab[[1]][[1]]) %in% sel.sp$Sp)]))
+
+cpue.best.hab.eqs.sel = lapply(cpue.best.hab.eqs, function(Y) lapply(Y,function(X)
+    X = X[,which(colnames(cpue.best.hab.eqs[[1]][[1]]) %in% sel.sp$Sp)]))
+
+## Names for the result list
+years <- c(seq(2030, 2100, by = 10),"2010")
+scenarios <- c(126, 245, 585)
+combinations <- paste0(rep(years, each = length(scenarios)), "_", rep(scenarios, times = length(years)))
+
+mean.PA.eqs = c(PA.hab.eqs[[1]],PA.hab.eqs[[2]],PA.hab.eqs[[3]],
+                PA.hab.eqs[[4]],PA.hab.eqs[[5]],PA.hab.eqs[[6]],
+                PA.hab.eqs[[7]],PA.hab.eqs[[8]],PA.hab.eqs[[9]])
+
+
+mean.cpue.eqs = c(cpue.hab.eqs[[1]],cpue.hab.eqs[[2]],
+                  cpue.hab.eqs[[3]],cpue.hab.eqs[[4]],
+                  cpue.hab.eqs[[5]],cpue.hab.eqs[[6]],
+                  cpue.hab.eqs[[7]],cpue.hab.eqs[[8]],
+                  cpue.hab.eqs[[9]])
+
+threshold_matrix <- function(matrix, thresh) {
+    ## Iterate through each column in the matrix
+      for (col.index in seq_len(ncol(matrix))) {
+          ## Iterate through each element in the column
+              for (row.index in seq_len(nrow(matrix))) {
+                  ## Compare the element with the threshold and set it to 0 if smallr
+                  if (!is.na(matrix[row.index, col.index]) &&
+                      matrix[row.index, col.index] < thresh[col.index]) {
+                                    matrix[row.index, col.index] <- 0
+                                          }
+                      }
+            }
+      return(matrix)
+    }
+## Use lapply to apply the thresholding function to each matrix in the list
+
+mean.cpue.eqs <- lapply(mean.cpue.eqs, threshold_matrix, thresh = thresh)
+
+
+mean.best.cpue.eqs = c(cpue.best.hab.eqs[[1]],cpue.best.hab.eqs[[2]],
+                       cpue.best.hab.eqs[[3]],cpue.best.hab.eqs[[4]],
+                       cpue.best.hab.eqs[[5]],cpue.best.hab.eqs[[6]],
+                       cpue.best.hab.eqs[[7]],cpue.best.hab.eqs[[8]],
+                       cpue.best.hab.eqs[[9]])
+
+
+mean.best.cpue.eqs <- lapply(mean.best.cpue.eqs, threshold_matrix, thresh = thresh)
+
+## Calculate the weighted mean for each matrix in X_list
+for (i in 1:27) {
+    ## PA
+    weighted.means <- data.frame(base::matrix(nrow = ncol(
+                                                  mean.cpue.eqs[[i]]),                                              ncol = 6, data = NA))
+    weighted.means[,1] <-
+        sapply(1:ncol(mean.PA.eqs[[i]]),
+               function(j)
+                   median(coo[mean.cpue.eqs[[i]][,j] > 0,1]))    
+    weighted.means[,2] <-
+        sapply(1:ncol(mean.PA.eqs[[i]]),
+               function(j)
+                   median(coo[mean.cpue.eqs[[i]][,j] > 0,2]))
+    weighted.means[,3] <- colSums(mean.cpue.eqs[[i]])
+    weighted.means[,4] <- colSums(mean.cpue.eqs[[i]]>0)
+    weighted.means[,5] <-"PA"
+    weighted.means[,6] <- colnames(mean.PA.eqs[[i]])
+    weighted.means[,7] <- combinations[i]
+    colnames(weighted.means) = c("Lon", "Lat", "CPUE",
+                                 "Area","Var", "Species", "Time")
+    weighted.means.l[[i]] = weighted.means
+    ## CPUE HAB
+    weighted.means <- data.frame(
+        base::matrix(nrow = ncol(mean.cpue.eqs[[i]]),ncol = 6))
+    weighted.means[,1] <-
+        sapply(1:ncol(mean.cpue.eqs[[i]]),
+               function(j)
+                   weighted.mean(coo[,1],mean.cpue.eqs[[i]][,j]))
+    weighted.means[,2] <-  
+       sapply(1:ncol(mean.cpue.eqs[[i]]),
+              function(j)
+                  weighted.mean(coo[,2],mean.cpue.eqs[[i]][,j]))
+    weighted.means[,3] <- colSums(mean.cpue.eqs[[i]])
+    weighted.means[,4] <- colSums(mean.cpue.eqs[[i]]>0)
+    weighted.means[,5] <-"cpuehab"
+    weighted.means[,6] <- colnames(mean.cpue.eqs[[i]])
+    weighted.means[,7] <- combinations[i]
+    colnames(weighted.means) = c("Lon", "Lat", "CPUE",
+                                 "Area","Var", "Species", "Time")
+    weighted.means.l.cpue[[i]] = weighted.means
+    ## CPUE BEST HAB
+    weighted.means <- data.frame(
+        base::matrix(nrow = ncol(mean.best.cpue.eqs[[i]]),ncol = 6))
+    weighted.means[,1] <-
+        sapply(1:ncol(mean.best.cpue.eqs[[i]]),
+               function(j)
+                   weighted.mean(coo[,1],mean.best.cpue.eqs[[i]][,j]))
+    weighted.means[,2] <-        
+       sapply(1:ncol(mean.best.cpue.eqs[[i]]),
+              function(j)
+                  weighted.mean(coo[,2],mean.best.cpue.eqs[[i]][,j]))   
+    weighted.means[,3] <- colSums(mean.best.cpue.eqs[[i]])
+    weighted.means[,4] <- colSums(mean.best.cpue.eqs[[i]]>0)
+    weighted.means[,5] <-"bestcpuehab"
+    weighted.means[,6] <- colnames(mean.best.cpue.eqs[[i]])
+    weighted.means[,7] <- combinations[i]
+    colnames(weighted.means) = c("Lon", "Lat", "CPUE","Area", "Var", "Species", "Time")
+    weighted.means.l.best.cpue[[i]] = weighted.means
+     print(i)    
+}
+
+w.means = do.call(rbind, weighted.means.l)
+w.means.cpue = do.call(rbind, weighted.means.l.cpue)
+w.means.best.cpue = do.call(rbind, weighted.means.l.best.cpue)
+w.means.all = rbind(w.means, w.means.cpue, w.means.best.cpue)
+
+write.csv(w.means.all, "centroid_distribution.csv")
+
+## 3.5 Estimate connectivity
+## 3.5.1 Calculate npolygons, size polygons and distance between polygons
+## PRESENCE ABSENCE 
+## First, I select a threshold and define PA areas
+library(landscapemetrics)
+
+## I transform to rasters
+rast = function(X) {
+    res = raster::stack()
+    for (i in 1:ncol(X)){
+        ras <- layers_historic_eqsize$depth
+        values(ras)[which(!is.na(values(ras)))] <- X[,i]
+        values(ras)[values(ras>0)] = 1
+        crs(ras) = "+proj=laea +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
+        res = stack(res, ras)
+        print(i)
+    }
+    return(res)
+}
+rast.pred.pa = lapply(mean.cpue.eqs, rast)
+
+rast.pred.cpue = lapply(mean.best.cpue.eqs, rast)
+
+## Calculate number of polygons and distance between them
+rpol = function(X) {
+    p = list()
+    for (i in 1:dim(X)[3]) {
+        r = X[[i]]
+        p[[i]] = lsm_p_enn(r)
+        p[[i]]$Species = colnames(mean.cpue.eqs[[1]])[i]
+        p[[i]]$Area= calculate_lsm(r, level = "patch", metric = "area")$value
+    }
+    return(p)
+}
+
+rpol.cpue = function(X) {
+    p = list()
+    for (i in 1:dim(X)[3]) {
+        r = X[[i]]
+        p[[i]] = lsm_p_enn(r)
+        p[[i]]$Species = colnames(mean.cpue.eqs[[1]])[i]
+        p[[i]]$Area= calculate_lsm(r, level = "patch", metric = "area")$value
+    }
+    return(p)
+}
+pols.pa = lapply(rast.pred.pa, rpol)
+
+pols.cpue = lapply(rast.pred.cpue, rpol.cpue)
+
+pols.pa <- lapply(pols.pa, function(lst) {
+    do.call(rbind, lapply(lst, function(df) {
+        data.frame(npol  = nrow(df),
+                   dist  = mean(df$value, na.rm = TRUE),
+                   areap = mean(df$Area), 
+                   Species = unique(df$Species))
+    }))
+})
+
+names(pols.pa) = combinations
+conn.pa <- dplyr::bind_rows(pols.pa, .id = "ListName")
+conn.pa$Estimate = "habitat"
+pols.cpue <- lapply(pols.cpue, function(lst) {
+    do.call(rbind, lapply(lst, function(df) {
+        data.frame(npol  = nrow(df),
+                   dist  = mean(df$value, na.rm = TRUE),
+                   areap = mean(df$Area), 
+                   Species = unique(df$Species))
+    }))
+})
+names(pols.cpue) = combinations
+conn.cpue <- dplyr::bind_rows(pols.cpue, .id = "ListName")
+conn.cpue$Estimate = "bestcpue"
+conn.final = rbind(conn.pa, conn.cpue)
+
+write.csv(conn.final, "connectivity.csv")
+
+## 3.6 Richness changes
+mean.PA = c(PA.hab[[1]],PA.hab[[2]],PA.hab[[3]],
+            PA.hab[[4]],PA.hab[[5]],PA.hab[[6]],
+            PA.hab[[7]],PA.hab[[8]],PA.hab[[9]])
+
+mean.PA = c(a.PA.mean[[1]],a.PA.mean[[2]],a.PA.mean[[3]],
+            a.PA.mean[[4]],a.PA.mean[[5]],a.PA.mean[[6]],
+            a.PA.mean[[7]],a.PA.mean[[8]],a.PA.mean[[9]])
+
+mean.cpue = c(cpue.hab.sel[[1]],cpue.hab.sel[[2]],
+              cpue.hab.sel[[3]],cpue.hab.sel[[4]],
+              cpue.hab.sel[[5]],cpue.hab.sel[[6]],
+              cpue.hab.sel[[7]],cpue.hab.sel[[8]],
+              cpue.hab.sel[[9]])
+
+mean.cpue = c(cpue.hab.sel[[1]],cpue.hab.sel[[2]],
+              cpue.hab.sel[[3]],cpue.hab.sel[[4]],
+              cpue.hab.sel[[5]],cpue.hab.sel[[6]],
+              cpue.hab.sel[[7]],cpue.hab.sel[[8]],
+              cpue.hab.sel[[9]])
+
+mean.cpue.eqs = c(cpue.hab.eqs.sel[[1]],cpue.hab.eqs.sel[[2]],
+              cpue.hab.eqs.sel[[3]],cpue.hab.eqs.sel[[4]],
+              cpue.hab.eqs.sel[[5]],cpue.hab.eqs.sel[[6]],
+              cpue.hab.eqs.sel[[7]],cpue.hab.eqs.sel[[8]],
+              cpue.hab.eqs.sel[[9]])
+
+saveRDS(list(mean.PA, mean.cpue, mean.cpue.eqs), "richnessobj.Rdata")
+
+## 3.6.1 Richness estimation
+
+getS <- function(x){return(rowSums(x))}
+richn = function(X) {(lapply(X,getS))}
+getSh <- function(x){return(diversity(x))}
+
+calculate_dominance <- function(row) {
+      total_sum <- sum(row)
+      percentages <- (max(row) / total_sum) * 100
+      return(percentages)
+}
+
+#Which species dominate? 
+calculate_max_column <- function(row) {
+      max_colname <- names(row)[which.max(row)]
+        return(max_colname)
+      }
+
+rich.dom = lapply(mean.cpue, function(x) apply(x,1,calculate_dominance))
+rich.dom.colname = lapply(mean.cpue.eqs, function(x) apply(x,1,calculate_max_column))
+dom.data = lapply(rich.dom.colname, function(x) (table(unlist(x))/1896)*100)
+
+saveRDS(dom.data, "Dominance_data.Rdata")
+
+rich = lapply(mean.PA, getS)
+rich.sh = lapply(mean.cpue, getSh)
+
+Richness   <- stack()
+Richness.u <- stack()
+Shan   <- stack()
+Shan.u <- stack()
+dominance <- stack()
+
+for (i in 1:27){
+    ras = all.layers[[1]][[1]]$depth 
+    ras.sh = all.layers[[1]][[1]]$depth
+    ras.dom= all.layers[[1]][[1]]$depth
+    values(ras)[!is.na(values(ras))]  <- na.omit(round(rich[[i]],0))
+    values(ras.sh)[!is.na(values(ras))]  <- na.omit(rich.sh[[i]],0)
+    values(ras.dom)[!is.na(values(ras))]  <- na.omit(rich.dom[[i]],0)
+    #ras.u = layers.historic$depth
+    #ras.u.sh = layers.historic$depth
+    #values(ras.u)[!is.na(values(ras.u))] <- S.UC[[i]]
+    #values(ras.u.sh)[!is.na(values(ras.u))] <- S.UC.sh[[i]]
+    Richness <- stack(Richness, ras)
+    #Richness.u <- stack(Richness.u, ras.u)
+    Shan <- stack(Shan, ras.sh)
+    dominance <- stack(dominance, ras.dom)
+    #Shan.u <- stack(Shan.u, ras.u.sh)
+}
+
+## I assign year and scenario to each element of the list
+names(Richness) = combinations
+names(Shan) = combinations
+names(dominance) = combinations
+
+writeRaster(Richness, file = "Richness_1.tiff", overwrite = T)
+writeRaster(dominance, file = "Dominance.tiff", overwrite = T)
+
+### 3.6.2 Richness correlation ###
+
+## Load data & caluclate richness 
+load("models/allData.R")
+
+Y[Y>0] = 1
+obs.rich = data.frame(obs = rowSums(Y), coords)
+
+load("models/allData.R")
+
+obs.rich$shan =  diversity(Y)
+
+## Predict richness
+obs.rich$pred = raster::extract(Richness[[25]], coords)
+obs.rich$shann = raster::extract(Shan[[25]], coords)
+
+## Check correlation between predicted and expected
+summary(obs.rich)
+cor.test(obs.rich$obs, obs.rich$pred)
+cor.test(obs.rich$shann, obs.rich$shan)
+
+load("models/unfitted new_models_yes_sic_rl_sp.Rdata")
+
+## 3.7 Cluster analysis
+
+pa.bc = vegan::vegdist(a.PA.m[[1]], method = "bray")
+nmds <- vegan::metaMDS(pa.bc, distance = "bray")
+hc = hclust(pa.bc, method = "complete")
+clusters = cutree(hc, k = 3)
+pdf("clusters.pdf")
+ggplot(a)+
+    geom_point(aes(x = NMDS1, y = NMDS2, col = Lat))
+dev.off()
+a = data.frame(vegan::scores(nmds))
+a$Lat = coo$y
+
+## 3.8 Future area per species analysis
+
+
+# Load the four chains of the models and join it into 1 Hmsc object
+library(Hmsc)
+library(raster)
+
+model.pa = models[[1]]
+model.ab = models[[2]]
+
+load("Env data/layers_historic_eqsize.Rdata")
+
+load("Env data/layers_present.Rdata")
+load("Env data/layers_2100_eqsize.Rdata")
+load("Env data/layers_2050_eqsize.Rdata")
+
+load("predictions_yes_sic_allyr.RData")
+
+layers.historic.eqsize = layers_historic_eqsize
+
+layers.100 = layers_2100_eqsize
+layers.50  = layers_2050_eqsize
+
+newr <- rasterStackToDataFrame(layers.historic.eqsize) #Xdata
+coo <- coordinates(layers.historic.eqsize)[complete.cases(newr),]
+pres.env<-newr[complete.cases(newr),]
+
+newr.50 <- lapply(layers.50,rasterStackToDataFrame) #Xdata
+coo.50 <- coordinates(layers.50[[1]])[complete.cases(newr.50[[1]]),]
+fut.env.50 <-lapply(newr.50, function(X){X[complete.cases(X),]})
+
+newr.100 <- lapply(layers.100,rasterStackToDataFrame) #Xdata
+coo.100 <- coordinates(layers.100[[1]])[complete.cases(newr.100[[1]]),]
+fut.env.100 <-lapply(newr.100, function(X){X[complete.cases(X),]})
+
+XdataN = pres.env
+
+sp.grad <- prepareGradient(models.pa,
+                           XDataNew = XdataN)
+
+pres = predict(models.pa, Gradient = sp.grad, type = "response")
+pres.cpue = predict(models.ab, Gradient = sp.grad, type = "response")
+## Take the mean probability of occurrence per species
+pres.p = Reduce("+", pres)/length(pres)
+pres.p.cpue = Reduce("+", pres.cpue)/length(pres.cpue)
+
+save(pres.p, file = "pres_p.rds")
+save(pres.p.cpue, file = "pres_p_cpue.rds")
+
+pres.p = readRDS("pres_p.rds")
+pres.p.cpue = readRDS("pres_p_cpue.rds")
+
+## How many of those species are not predicted anywhere?
+length(which(colSums(pres.p) == 0)) # 2 species not predicted anywhere
+colnames(pres.p)[which(colSums(pres.p) == 0)] # 2 species not predicted anywhere
+
+## From the species predicted somewhere, what is the quantile 10 and 90?
+thresh = read.csv("thresholds.csv")
+prob.PA = 0.1
+prob.PA.best = 0.8
+arbitrarythresh = 0.8
+p10 = apply(pres.p,2, function(col){
+            non.zero.values <- col[col != 0]
+                        quantile(non.zero.values, probs = prob.PA)})
+
+p10 = thresh$threshold
+
+p90 = apply(pres.p,2, function(col){
+            non.zero.values <- col[col != 0]
+                        quantile(non.zero.values,
+                                 probs = prob.PA.best)})
+
+p10.cpue = apply(pres.p.cpue,2, function(col){
+            non.zero.values <- col[col != 0]
+                        quantile(non.zero.values, probs = prob.PA)})
+
+p90.cpue = apply(pres.p.cpue,2, function(col){
+            non.zero.values <- col[col != 0]
+                        quantile(non.zero.values,
+                                 probs = prob.PA.best)})
+
+
+## Present suit hab
+pres.hab = ifelse(pres.p > thresh$threshold, 1,0)
+Present.Habitat =  colSums(pres.hab)
+
+## Present suit hab
+
+pres.hab.cpue = pres.hab * pres.p.cpue #ifelse(pres.p.cpue > p10.cpue, 1,0)
+
+pres.hab.cpue = ifelse(pres.hab.cpue > p90.cpue, 1,0)
+Present.Habitat.cpue =  colSums(pres.hab.cpue)
+
+## Future suit hab
+fut.env = c(fut.env.50, fut.env.100)
+names(fut.env) = c("126.50","246.50","585.50","126.100","246.100","585.100")
+
+years <- seq(2030, 2100, by = 10)
+scenarios <- c(126, 245, 585)
+
+combinations <- paste0(rep(years, each = length(scenarios)), "_", rep(scenarios, times = length(years)))
+
+fut.env = c(all.env.eqs[[1]],all.env.eqs[[2]],all.env.eqs[[3]],
+            all.env.eqs[[4]],all.env.eqs[[5]],all.env.eqs[[6]],
+            all.env.eqs[[7]],all.env.eqs[[8]])
+            
+names(fut.env) = combinations
+
+mean.PA.eqsize = c(a.PA.eqs.mean[[1]], a.PA.eqs.mean[[2]], a.PA.eqs.mean[[3]],
+            a.PA.eqs.mean[[4]],a.PA.eqs.mean[[5]],a.PA.eqs.mean[[6]],
+            a.PA.eqs.mean[[7]],a.PA.eqs.mean[[8]])
+
+mean.cpue.eqsize = c(a.cpue.eqs.mean[[1]],a.cpue.eqs.mean[[2]],a.cpue.eqs.mean[[3]],
+              a.cpue.eqs.mean[[4]],a.cpue.eqs.mean[[5]],a.cpue.eqs.mean[[6]],
+              a.cpue.eqs.mean[[7]],a.cpue.eqs.mean[[8]])
+
+mean.PA.eqsize = lapply(mean.PA.eqsize, function(x) ifelse(x > thresh$threshold, 1,0))
+
+rm(result.df)
+for (i in 1:length(fut.env)){
+    XdataNf = fut.env[[i]]
+    sp.grad.f <- prepareGradient(models.pa,
+                                 XDataNew = XdataNf)
+    stack.label <- names(fut.env)[[i]]
+    pred.fut = mean.PA.eqsize[[i]]
+    pred.fut.cpue = mean.cpue.eqsize[[i]] * pred.fut
+    fut.p = pred.fut.cpue   
+    fut.p = fut.p[,colnames(fut.p) %in% colnames(pres.p)]
+    fut.hab = ifelse(fut.p > thresh$threshold ,1,0)
+    fut.hab = colSums(pred.fut)
+    fut.best.hab90th.cpue = ifelse(pred.fut.cpue > p90.cpue,1,0)
+    fut.best.hab90th.area.cpue = colSums(fut.best.hab90th.cpue)
+    result.fut <- data.frame(
+        fut.hab = unname(fut.hab),
+        fut.best.hab90th.area.cpue = unname(fut.best.hab90th.area.cpue))    
+    colnames(result.fut) <- c(
+        paste(stack.label,".Habitat",sep = ""),
+        paste(stack.label,".BestHabitatQNT", sep = ""))
+    if (exists("result.df")) {
+        result.df <- cbind(result.df,result.fut)
+    } else {
+        result.df <- result.fut
+    }
+    print(stack.label)
+}
+
+result.df.final = cbind(result.df,
+            Species = colnames(pres.hab),
+            His.Present.Habitat  = unname(Present.Habitat) ,
+            His.Present.BestHabitatQNT = unname(Present.Habitat.cpue))
+
+summary(result.df.final)
+write.csv(result.df.final, "cell_change3.csv")
